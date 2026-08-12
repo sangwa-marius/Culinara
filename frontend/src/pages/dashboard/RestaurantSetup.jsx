@@ -132,7 +132,7 @@ export default function RestaurantSetup() {
   if (fetching) return <div className="flex items-center justify-center py-20"><Spinner /></div>;
 
   return (
-    <div className="p-6 max-w-2xl mx-auto pb-12">
+    <div className="p-4 sm:p-6 max-w-2xl mx-auto pb-12">
 
       {/* Back */}
       {isEdit && (
@@ -156,29 +156,30 @@ export default function RestaurantSetup() {
       </div>
 
       {/* Step progress */}
-      <div className="flex items-center justify-center gap-0 mb-8">
+      <div className="flex items-center justify-center gap-0 mb-6 sm:mb-8 overflow-x-auto pb-2">
         {STEPS.map((s, i) => {
           const StepIcon = s.icon;
           const done    = step > s.number;
           const active  = step === s.number;
           return (
-            <div key={s.number} className="flex items-center">
+            <div key={s.number} className="flex items-center shrink-0">
               <div className="flex flex-col items-center">
                 <div className={clsx(
-                  "w-9 h-9 rounded-full flex items-center justify-center border-2 transition-all",
+                  "w-7 h-7 sm:w-9 sm:h-9 rounded-full flex items-center justify-center border-2 transition-all",
                   done   ? "bg-primary-500 border-primary-500 text-white"
                          : active ? "border-primary-500 text-primary-500 bg-primary-50 dark:bg-primary-950/30"
                                   : "border-cream-400 dark:border-stone-700 text-stone-400"
                 )}>
-                  {done ? <CheckCircle size={17} /> : <StepIcon size={15} />}
+                  {done ? <CheckCircle size={14} className="sm:hidden" /> : <StepIcon size={12} className="sm:hidden" />}
+                  {done ? <CheckCircle size={17} className="hidden sm:block" /> : <StepIcon size={15} className="hidden sm:block" />}
                 </div>
-                <span className={clsx("text-[10px] font-semibold mt-1 uppercase tracking-wide",
+                <span className={clsx("text-[8px] sm:text-[10px] font-semibold mt-1 uppercase tracking-wide whitespace-nowrap",
                   active ? "text-primary-500" : done ? "text-stone-500" : "text-stone-300 dark:text-stone-600")}>
                   {s.label}
                 </span>
               </div>
               {i < STEPS.length - 1 && (
-                <div className={clsx("w-16 sm:w-24 h-0.5 mx-2 mb-4 transition-all",
+                <div className={clsx("w-10 sm:w-16 lg:w-24 h-0.5 mx-1 sm:mx-2 mb-4 transition-all",
                   step > s.number ? "bg-primary-500" : "bg-cream-300 dark:bg-stone-800")} />
               )}
             </div>
@@ -202,14 +203,14 @@ export default function RestaurantSetup() {
             <Field label="Description">
               <textarea value={form.description} onChange={e => updateField("description", e.target.value)}
                 placeholder="Tell customers what makes your restaurant special…"
-                rows={3} className="input-field resize-none" />
+                rows={2} className="input-field resize-none" />
             </Field>
 
             <Field label="Cuisine Type" required hint={`${form.cuisine.length} selected`}>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-1.5 sm:gap-2">
                 {CUISINE_OPTIONS.map(c => (
                   <button key={c} type="button" onClick={() => toggleCuisine(c)}
-                    className={clsx("px-3 py-1.5 rounded-full text-xs font-semibold border-2 transition-all",
+                    className={clsx("px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-semibold border-2 transition-all",
                       form.cuisine.includes(c)
                         ? "bg-primary-500 border-primary-500 text-white"
                         : "border-cream-400 dark:border-stone-700 text-stone-500 dark:text-stone-400 hover:border-primary-400")}>
@@ -219,18 +220,18 @@ export default function RestaurantSetup() {
               </div>
             </Field>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div>
-                <p className="text-xs font-semibold text-stone-500 uppercase tracking-wide mb-2">Logo</p>
+                <p className="text-[10px] sm:text-xs font-semibold text-stone-500 uppercase tracking-wide mb-1.5 sm:mb-2">Logo</p>
                 <ImageUploader label="" hint="Square · max 5MB" value={form.logo} onChange={url => updateField("logo", url)} />
               </div>
               <div>
-                <p className="text-xs font-semibold text-stone-500 uppercase tracking-wide mb-2">Cover Image</p>
+                <p className="text-[10px] sm:text-xs font-semibold text-stone-500 uppercase tracking-wide mb-1.5 sm:mb-2">Cover Image</p>
                 <ImageUploader label="" hint="Landscape · max 5MB" aspect="wide" value={form.coverImage} onChange={url => updateField("coverImage", url)} />
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <Field label="Phone" icon={Phone}>
                 <input value={form.phone} onChange={e => updateField("phone", e.target.value)}
                   placeholder="+250 700 000 000" className="input-field" />
@@ -248,7 +249,7 @@ export default function RestaurantSetup() {
           <>
             <SectionTitle icon={Clock}>Operational Setup</SectionTitle>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
               <Field label="Delivery Fee ($)" icon={DollarSign}>
                 <input type="number" step="0.01" min="0" value={form.deliveryFee}
                   onChange={e => updateField("deliveryFee", e.target.value)} className="input-field" />
@@ -265,25 +266,25 @@ export default function RestaurantSetup() {
             </div>
 
             <div>
-              <p className="text-xs font-semibold text-stone-500 uppercase tracking-wide mb-3">Opening Hours</p>
-              <div className="space-y-2.5">
+              <p className="text-[10px] sm:text-xs font-semibold text-stone-500 uppercase tracking-wide mb-2 sm:mb-3">Opening Hours</p>
+              <div className="space-y-2 sm:space-y-2.5">
                 {DAYS.map(day => {
                   const h = form.openingHours[day] || { open:"09:00", close:"22:00", isClosed:false };
                   return (
-                    <div key={day} className="flex items-center gap-3">
-                      <span className="w-7 text-xs font-bold text-stone-500 dark:text-stone-400 uppercase shrink-0">{day.slice(0,3)}</span>
-                      <label className="flex items-center gap-1.5 text-xs text-stone-500 dark:text-stone-400 shrink-0 cursor-pointer select-none">
+                    <div key={day} className="flex items-center gap-2 sm:gap-3">
+                      <span className="w-6 sm:w-7 text-[10px] sm:text-xs font-bold text-stone-500 dark:text-stone-400 uppercase shrink-0">{day.slice(0,3)}</span>
+                      <label className="flex items-center gap-1 text-[10px] sm:text-xs text-stone-500 dark:text-stone-400 shrink-0 cursor-pointer select-none">
                         <input type="checkbox" checked={!h.isClosed} onChange={e => updateHours(day, "isClosed", !e.target.checked)} className="rounded accent-primary-500" />
                         Open
                       </label>
                       {!h.isClosed ? (
-                        <div className="flex items-center gap-2 flex-1">
-                          <input type="time" value={h.open} onChange={e => updateHours(day, "open", e.target.value)} className="input-field py-1.5 text-xs flex-1" />
-                          <span className="text-stone-400 text-xs">to</span>
-                          <input type="time" value={h.close} onChange={e => updateHours(day, "close", e.target.value)} className="input-field py-1.5 text-xs flex-1" />
+                        <div className="flex items-center gap-1.5 sm:gap-2 flex-1">
+                          <input type="time" value={h.open} onChange={e => updateHours(day, "open", e.target.value)} className="input-field py-1 sm:py-1.5 text-[10px] sm:text-xs flex-1" />
+                          <span className="text-stone-400 text-[10px] sm:text-xs">to</span>
+                          <input type="time" value={h.close} onChange={e => updateHours(day, "close", e.target.value)} className="input-field py-1 sm:py-1.5 text-[10px] sm:text-xs flex-1" />
                         </div>
                       ) : (
-                        <span className="text-xs text-stone-400 italic">Closed</span>
+                        <span className="text-[10px] sm:text-xs text-stone-400 italic">Closed</span>
                       )}
                     </div>
                   );
@@ -292,11 +293,12 @@ export default function RestaurantSetup() {
             </div>
 
             {!isEdit && (
-              <div className="flex items-start gap-3 p-4 rounded-xl bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800/40">
-                <AlertCircle size={16} className="text-amber-500 shrink-0 mt-0.5" />
+              <div className="flex items-start gap-2 sm:gap-3 p-3 sm:p-4 rounded-xl bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800/40">
+                <AlertCircle size={14} className="sm:hidden text-amber-500 shrink-0 mt-0.5" />
+                <AlertCircle size={16} className="hidden sm:block text-amber-500 shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-sm font-semibold text-amber-800 dark:text-amber-400">Pending Admin Approval</p>
-                  <p className="text-xs text-amber-600 dark:text-amber-500 mt-0.5">Your restaurant will be reviewed before going live. Usually within 48 hours.</p>
+                  <p className="text-xs sm:text-sm font-semibold text-amber-800 dark:text-amber-400">Pending Admin Approval</p>
+                  <p className="text-[10px] sm:text-xs text-amber-600 dark:text-amber-500 mt-0.5">Your restaurant will be reviewed before going live. Usually within 48 hours.</p>
                 </div>
               </div>
             )}
@@ -358,75 +360,75 @@ export default function RestaurantSetup() {
             <p className="text-sm text-stone-500 dark:text-stone-400 -mt-2 mb-1">
               You can upgrade or downgrade at any time from your dashboard.
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {[
-                {
-                  key: "basic", label: "Basic", price: "$49/mo",
-                  color: "border-stone-300 dark:border-stone-700",
-                  active: "border-primary-500 bg-primary-50 dark:bg-primary-950/20",
-                  features: ["Up to 250 orders/month","Digital Menu Builder","Basic Inventory","Email Support","QR Code Ordering"],
-                },
-                {
-                  key: "pro", label: "Pro", price: "$129/mo",
-                  badge: "Most Popular",
-                  color: "border-stone-300 dark:border-stone-700",
-                  active: "border-primary-500 bg-primary-50 dark:bg-primary-950/20",
-                  features: ["Unlimited Orders","Advanced Analytics","Automated Restock Alerts","24/7 Priority Support","Kitchen Display System","Staff Management"],
-                },
-                {
-                  key: "enterprise", label: "Enterprise", price: "$349/mo",
-                  color: "border-stone-300 dark:border-stone-700",
-                  active: "border-primary-500 bg-primary-50 dark:bg-primary-950/20",
-                  features: ["Multi-Outlet Management","Custom API Integrations","White-labelled Apps","Dedicated Success Manager","SLA Guarantee"],
-                },
-              ].map(plan => (
-                <button key={plan.key} type="button" onClick={() => updateField("subscription", plan.key)}
-                  className={clsx("relative text-left p-4 rounded-xl border-2 transition-all",
-                    form.subscription === plan.key ? plan.active : plan.color + " hover:border-primary-300 dark:hover:border-primary-700")}>
-                  {plan.badge && (
-                    <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-primary-500 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wide whitespace-nowrap">
-                      {plan.badge}
-                    </span>
-                  )}
-                  <div className="flex items-center justify-between mb-3 mt-1">
-                    <span className="font-bold text-stone-900 dark:text-white">{plan.label}</span>
-                    <span className={clsx("text-sm font-bold", form.subscription === plan.key ? "text-primary-600 dark:text-primary-400" : "text-stone-600 dark:text-stone-300")}>
-                      {plan.price}
-                    </span>
-                  </div>
-                  <ul className="space-y-1.5">
-                    {plan.features.map(f => (
-                      <li key={f} className="flex items-start gap-2 text-xs text-stone-600 dark:text-stone-400">
-                        <CheckCircle size={12} className={clsx("shrink-0 mt-0.5", form.subscription === plan.key ? "text-primary-500" : "text-stone-400")} />
-                        {f}
-                      </li>
-                    ))}
-                  </ul>
-                  {form.subscription === plan.key && (
-                    <div className="mt-3 pt-2 border-t border-primary-200 dark:border-primary-800/40">
-                      <p className="text-xs font-bold text-primary-600 dark:text-primary-400 flex items-center gap-1">
-                        <CheckCircle size={12} /> Selected
-                      </p>
-                    </div>
-                  )}
-                </button>
-              ))}
-            </div>
+             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+               {[
+                 {
+                   key: "basic", label: "Basic", price: "$49/mo",
+                   color: "border-stone-300 dark:border-stone-700",
+                   active: "border-primary-500 bg-primary-50 dark:bg-primary-950/20",
+                   features: ["Up to 250 orders/month","Digital Menu Builder","Basic Inventory","Email Support","QR Code Ordering"],
+                 },
+                 {
+                   key: "pro", label: "Pro", price: "$129/mo",
+                   badge: "Most Popular",
+                   color: "border-stone-300 dark:border-stone-700",
+                   active: "border-primary-500 bg-primary-50 dark:bg-primary-950/20",
+                   features: ["Unlimited Orders","Advanced Analytics","Automated Restock Alerts","24/7 Priority Support","Kitchen Display System","Staff Management"],
+                 },
+                 {
+                   key: "enterprise", label: "Enterprise", price: "$349/mo",
+                   color: "border-stone-300 dark:border-stone-700",
+                   active: "border-primary-500 bg-primary-50 dark:bg-primary-950/20",
+                   features: ["Multi-Outlet Management","Custom API Integrations","White-labelled Apps","Dedicated Success Manager","SLA Guarantee"],
+                 },
+               ].map(plan => (
+                 <button key={plan.key} type="button" onClick={() => updateField("subscription", plan.key)}
+                   className={clsx("relative text-left p-3 sm:p-4 rounded-xl border-2 transition-all",
+                     form.subscription === plan.key ? plan.active : plan.color + " hover:border-primary-300 dark:hover:border-primary-700")}>
+                   {plan.badge && (
+                     <span className="absolute -top-2 sm:-top-2.5 left-1/2 -translate-x-1/2 bg-primary-500 text-white text-[9px] sm:text-[10px] font-black px-2 sm:px-2.5 py-0.5 rounded-full uppercase tracking-wide whitespace-nowrap">
+                       {plan.badge}
+                     </span>
+                   )}
+                   <div className="flex items-center justify-between mb-2 sm:mt-1">
+                     <span className="font-bold text-stone-900 dark:text-white text-sm">{plan.label}</span>
+                     <span className={clsx("text-xs sm:text-sm font-bold", form.subscription === plan.key ? "text-primary-600 dark:text-primary-400" : "text-stone-600 dark:text-stone-300")}>
+                       {plan.price}
+                     </span>
+                   </div>
+                   <ul className="space-y-1 sm:space-y-1.5">
+                     {plan.features.map(f => (
+                       <li key={f} className="flex items-start gap-1.5 sm:gap-2 text-[10px] sm:text-xs text-stone-600 dark:text-stone-400">
+                         <CheckCircle size={10} className={clsx("shrink-0 mt-0.5", form.subscription === plan.key ? "text-primary-500" : "text-stone-400")} />
+                         {f}
+                       </li>
+                     ))}
+                   </ul>
+                   {form.subscription === plan.key && (
+                     <div className="mt-2 sm:mt-3 pt-1.5 sm:pt-2 border-t border-primary-200 dark:border-primary-800/40">
+                       <p className="text-[10px] sm:text-xs font-bold text-primary-600 dark:text-primary-400 flex items-center gap-1">
+                         <CheckCircle size={10} /> Selected
+                       </p>
+                     </div>
+                   )}
+                 </button>
+               ))}
+             </div>
           </>
         )}
 
         {/* Navigation */}
-        <div className="flex justify-between gap-3 pt-6 border-t border-cream-300 dark:border-stone-800">
+        <div className="flex flex-col sm:flex-row justify-between gap-2 sm:gap-3 pt-4 sm:pt-6 border-t border-cream-300 dark:border-stone-800">
           {step > 1
-            ? <button onClick={() => setStep(s => s - 1)} className="btn-secondary flex items-center gap-2"><ArrowLeft size={15}/> Back</button>
+            ? <button onClick={() => setStep(s => s - 1)} className="btn-secondary flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-sm py-2 sm:py-2.5"><ArrowLeft size={13} className="sm:hidden" /><ArrowLeft size={15} className="hidden sm:block" /> Back</button>
             : <div />
           }
           {step < STEPS.length
-            ? <button onClick={handleNext} className="btn-primary flex items-center gap-2">Next <ChevronRight size={15}/></button>
-            : <button onClick={handleSubmit} disabled={loading} className="btn-primary flex items-center gap-2 disabled:opacity-60">
+            ? <button onClick={handleNext} className="btn-primary flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-sm py-2 sm:py-2.5">Next <ChevronRight size={13} className="sm:hidden" /><ChevronRight size={15} className="hidden sm:block" /></button>
+            : <button onClick={handleSubmit} disabled={loading} className="btn-primary flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-sm py-2 sm:py-2.5 disabled:opacity-60">
                 {loading
-                  ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"/>{isEdit ? "Saving…" : "Creating…"}</>
-                  : isEdit ? <><Save size={15}/> Save Changes</> : <><CheckCircle size={15}/> Submit Restaurant</>
+                  ? <><div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-white border-t-transparent rounded-full animate-spin"/>{isEdit ? "Saving…" : "Creating…"}</>
+                  : isEdit ? <><Save size={13} className="sm:hidden" /><Save size={15} className="hidden sm:block" /> Save Changes</> : <><CheckCircle size={13} className="sm:hidden" /><CheckCircle size={15} className="hidden sm:block" /> Submit Restaurant</>
                 }
               </button>
           }
