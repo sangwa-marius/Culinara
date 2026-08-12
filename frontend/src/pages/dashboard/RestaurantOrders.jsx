@@ -164,22 +164,22 @@ export default function RestaurantOrders() {
   if (loading) return <div className="flex items-center justify-center py-20"><Spinner /></div>;
 
   return (
-    <div className="p-6 space-y-5">
+    <div className="p-4 sm:p-6 space-y-4 sm:space-y-5">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-stone-900 dark:text-white">Orders</h1>
-          <p className="text-sm text-stone-400 mt-0.5">Manage and track all your restaurant orders</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-stone-900 dark:text-white">Orders</h1>
+          <p className="text-xs sm:text-sm text-stone-400 mt-0.5">Manage and track all your restaurant orders</p>
         </div>
-        <div className="text-sm text-stone-500">{orders.length} total</div>
+        <div className="text-xs sm:text-sm text-stone-500">{orders.length} total</div>
       </div>
 
       <div className="card overflow-hidden">
-        <div className="px-5 py-3 border-b border-cream-300 dark:border-stone-800 flex items-center gap-1.5 overflow-x-auto scrollbar-hide">
+        <div className="px-4 sm:px-5 py-2.5 sm:py-3 border-b border-cream-300 dark:border-stone-800 flex items-center gap-1.5 overflow-x-auto scrollbar-hide">
           {TABS.map(tab => {
             const count = tab === "all" ? orders.length : orders.filter(o => o.status === tab).length;
             return (
               <button key={tab} onClick={() => setActiveTab(tab)}
-                className={clsx("px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all",
+                className={clsx("px-2.5 sm:px-3 py-1.5 rounded-lg text-[10px] sm:text-xs font-semibold whitespace-nowrap transition-all",
                   activeTab === tab ? "bg-primary-500 text-white" : "text-stone-500 hover:text-stone-800 hover:bg-cream-200 dark:hover:bg-stone-800")}>
                 {tab === "all" ? `All (${orders.length})` : tab.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase())}
                 {tab !== "all" && count > 0 && ` (${count})`}
@@ -190,51 +190,51 @@ export default function RestaurantOrders() {
 
         <div className="divide-y divide-cream-200 dark:divide-stone-800">
           {filtered.length === 0 ? (
-            <p className="py-10 text-center text-stone-400 text-sm">No orders in this category</p>
+            <p className="py-8 sm:py-10 text-center text-stone-400 text-xs sm:text-sm">No orders in this category</p>
           ) : filtered.map(order => {
             const isDineIn = order.orderType === "dine_in";
             const next     = getNextStatus(order);
             const nextLabel= getNextLabel(order);
 
             return (
-              <div key={order._id} className="px-5 py-4 hover:bg-cream-50 dark:hover:bg-stone-800/40 transition-colors">
-                <div className="flex items-start justify-between gap-4">
+              <div key={order._id} className="px-4 sm:px-5 py-3 sm:py-4 hover:bg-cream-50 dark:hover:bg-stone-800/40 transition-colors">
+                <div className="flex items-start justify-between gap-3 sm:gap-4">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap mb-1">
-                      <span className="font-bold text-stone-900 dark:text-white text-sm">#{order.orderNumber}</span>
+                    <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap mb-1">
+                      <span className="font-bold text-stone-900 dark:text-white text-xs sm:text-sm">#{order.orderNumber}</span>
                       <OrderStatusBadge status={order.status} />
-                      <span className={clsx("badge text-[10px]",
+                      <span className={clsx("badge text-[9px] sm:text-[10px]",
                         isDineIn
                           ? "bg-blue-50 text-blue-600 dark:bg-blue-950/30 dark:text-blue-400"
                           : "bg-green-50 text-green-600 dark:bg-green-950/30 dark:text-green-400")}>
-                        {isDineIn ? <><Users size={9} className="inline mr-0.5"/>Dine-in</> : <><Truck size={9} className="inline mr-0.5"/>Delivery</>}
+                        {isDineIn ? <><Users size={8} className="inline mr-0.5"/>Dine-in</> : <><Truck size={8} className="inline mr-0.5"/>Delivery</>}
                       </span>
                       {isDineIn && order.tableNumber && (
-                        <span className="badge bg-primary-50 text-primary-600 dark:bg-primary-950/30 dark:text-primary-400 text-[10px]">
+                        <span className="badge bg-primary-50 text-primary-600 dark:bg-primary-950/30 dark:text-primary-400 text-[9px] sm:text-[10px]">
                           Table {order.tableNumber}
                         </span>
                       )}
                     </div>
-                    <p className="text-xs text-stone-400">
+                    <p className="text-[10px] sm:text-xs text-stone-400">
                       {order.customer?.name}
                       {order.createdAt && ` · ${format(new Date(order.createdAt), "MMM d, HH:mm")}`}
                     </p>
-                    <p className="text-xs text-stone-500 mt-0.5">
+                    <p className="text-[10px] sm:text-xs text-stone-500 mt-0.5">
                       {order.items?.slice(0, 2).map(i => `${i.name} ×${i.quantity}`).join(", ")}
                       {order.items?.length > 2 && ` +${order.items.length - 2} more`}
                     </p>
                   </div>
 
                   <div className="text-right shrink-0">
-                    <p className="font-bold text-stone-900 dark:text-white">${order.total?.toFixed(2)}</p>
-                    <div className="flex items-center gap-2 mt-2 justify-end flex-wrap">
+                    <p className="font-bold text-stone-900 dark:text-white text-xs sm:text-sm">${order.total?.toFixed(2)}</p>
+                    <div className="flex items-center gap-1.5 sm:gap-2 mt-1.5 sm:mt-2 justify-end flex-wrap">
                       <button onClick={() => openDetail(order)}
-                        className="text-xs px-3 py-1.5 rounded-lg font-semibold bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-700 transition-colors flex items-center gap-1">
-                        <Eye size={11} /> View
+                        className="text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 rounded-lg font-semibold bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-700 transition-colors flex items-center gap-1">
+                        <Eye size={10} className="sm:hidden" /><Eye size={11} className="hidden sm:block" /> View
                       </button>
                       {next && nextLabel && (
                         <button onClick={() => updateStatus(order._id, next)}
-                          className={clsx("text-xs px-3 py-1.5 rounded-lg font-semibold transition-colors",
+                          className={clsx("text-[10px] sm:text-xs px-2 sm:px-3 py-1.5 rounded-lg font-semibold transition-colors",
                             next === "delivered"
                               ? "bg-green-500 hover:bg-green-600 text-white"
                               : "bg-primary-500 hover:bg-primary-600 text-white")}>
@@ -243,8 +243,8 @@ export default function RestaurantOrders() {
                       )}
                       {!isDineIn && order.status === "ready_for_pickup" && (
                         <button onClick={() => openNotify(order._id)}
-                          className="text-xs btn-secondary py-1.5 px-3">
-                          Notify Driver
+                          className="text-[10px] sm:text-xs btn-secondary py-1.5 px-2 sm:px-3">
+                          Notify
                         </button>
                       )}
                     </div>

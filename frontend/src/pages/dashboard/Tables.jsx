@@ -122,31 +122,32 @@ export default function Tables() {
   if (loading) return <div className="flex items-center justify-center py-20"><Spinner /></div>;
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-bold text-stone-900 dark:text-white text-xl">Table Management</h1>
+          <h1 className="font-bold text-stone-900 dark:text-white text-lg sm:text-xl">Table Management</h1>
           <p className="text-xs text-stone-400 mt-0.5">Monitor status and manage your dining layout</p>
         </div>
-        <button onClick={openAdd} className="btn-primary gap-2"><Plus size={15} /> Add Table</button>
+        <button onClick={openAdd} className="btn-primary gap-1.5 sm:gap-2 text-xs sm:text-sm py-2 sm:py-2.5 px-3 sm:px-4"><Plus size={13} className="sm:hidden" /><Plus size={15} className="hidden sm:block" /> Add Table</button>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
         {[
           { label: "Total Tables",  value: stats.total,     icon: Armchair },
           { label: "Available",     value: stats.available, icon: CheckCircle },
           { label: "Occupied",      value: stats.occupied,  icon: Users },
           { label: "Remaining Seats", value: stats.remaining, icon: Users },
         ].map(s => (
-          <div key={s.label} className="card p-4 flex items-center gap-3">
-            <div className="w-9 h-9 bg-cream-200 dark:bg-stone-800 rounded-xl flex items-center justify-center shrink-0">
-              <s.icon size={18} className="text-stone-500 dark:text-stone-400" />
+          <div key={s.label} className="card p-3 sm:p-4 flex items-center gap-2 sm:gap-3">
+            <div className="w-7 h-7 sm:w-9 sm:h-9 bg-cream-200 dark:bg-stone-800 rounded-lg sm:rounded-xl flex items-center justify-center shrink-0">
+              <s.icon size={14} className="sm:hidden text-stone-500 dark:text-stone-400" />
+              <s.icon size={18} className="hidden sm:block text-stone-500 dark:text-stone-400" />
             </div>
             <div>
-              <p className="text-xs text-stone-400">{s.label}</p>
-              <p className="font-bold text-stone-900 dark:text-white text-xl">{s.value}</p>
+              <p className="text-[10px] sm:text-xs text-stone-400">{s.label}</p>
+              <p className="font-bold text-stone-900 dark:text-white text-base sm:text-xl">{s.value}</p>
             </div>
           </div>
         ))}
@@ -154,46 +155,48 @@ export default function Tables() {
 
       {/* Table grid */}
       {tables.length === 0 ? (
-        <div className="card p-16 text-center">
-          <div className="w-14 h-14 bg-cream-200 dark:bg-stone-800 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Armchair size={26} className="text-stone-400" />
+        <div className="card p-8 sm:p-16 text-center">
+          <div className="w-12 h-12 sm:w-14 sm:h-14 bg-cream-200 dark:bg-stone-800 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+            <Armchair size={20} className="sm:hidden text-stone-400" />
+            <Armchair size={26} className="hidden sm:block text-stone-400" />
           </div>
-          <h3 className="font-bold text-stone-900 dark:text-white mb-2">No tables yet</h3>
-          <p className="text-stone-400 text-sm mb-5">Add your first table to start managing your dining area</p>
-          <button onClick={openAdd} className="btn-primary gap-2"><Plus size={15} /> Add First Table</button>
+          <h3 className="font-bold text-stone-900 dark:text-white mb-2 text-sm sm:text-base">No tables yet</h3>
+          <p className="text-stone-400 text-xs sm:text-sm mb-4 sm:mb-5">Add your first table to start managing your dining area</p>
+          <button onClick={openAdd} className="btn-primary gap-1.5 sm:gap-2 text-xs sm:text-sm py-2 sm:py-2.5 px-3 sm:px-4"><Plus size={13} className="sm:hidden" /><Plus size={15} className="hidden sm:block" /> Add First Table</button>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-2 sm:gap-3">
           {tables.map(t => {
             const cfg = STATUS_CFG[t.status] || STATUS_CFG.available;
             return (
-              <div key={t._id} className={`relative border-2 rounded-xl p-4 transition-all hover:shadow-md ${cfg.card}`}>
+              <div key={t._id} className={`relative border-2 rounded-xl p-3 sm:p-4 transition-all hover:shadow-md ${cfg.card}`}>
                 {/* Actions */}
-                <div className="flex items-start justify-between mb-3">
-                  <span className={clsx("text-[10px] font-bold flex items-center gap-1", cfg.text)}>
-                    <span className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`} />
+                <div className="flex items-start justify-between mb-2 sm:mb-3">
+                  <span className={clsx("text-[9px] sm:text-[10px] font-bold flex items-center gap-1", cfg.text)}>
+                    <span className={`w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full ${cfg.dot}`} />
                     {cfg.label}
                   </span>
-                  <div className="flex gap-1">
+                  <div className="flex gap-0.5 sm:gap-1">
                     <button onClick={() => openEdit(t)} className="p-1 rounded hover:bg-white/60 dark:hover:bg-black/20 transition-colors">
-                      <Pencil size={11} className="text-stone-400" />
+                      <Pencil size={10} className="sm:hidden text-stone-400" />
+                      <Pencil size={11} className="hidden sm:block text-stone-400" />
                     </button>
                     <button onClick={() => setDeleteTarget(t._id)} className="p-1 rounded hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors">
-                      <Trash2 size={11} className="text-red-400" />
+                      <Trash2 size={10} className="sm:hidden text-red-400" />
+                      <Trash2 size={11} className="hidden sm:block text-red-400" />
                     </button>
                   </div>
                 </div>
 
-                {/* Click to cycle status */}
                 <div>
-                  <p className={clsx("font-black text-2xl", cfg.text)}>T-{String(t.number).padStart(2, "0")}</p>
-                  <div className="flex items-center gap-2 mt-1">
+                  <p className={clsx("font-black text-xl sm:text-2xl", cfg.text)}>T-{String(t.number).padStart(2, "0")}</p>
+                  <div className="flex items-center gap-1 sm:gap-2 mt-1">
                     <Users size={10} className="text-stone-400" />
-                    <span className="text-xs text-stone-500">{t.capacity} seats</span>
+                    <span className="text-[10px] sm:text-xs text-stone-500">{t.capacity} seats</span>
                   </div>
-                  {t.location && <p className="text-[10px] text-stone-400 mt-0.5 truncate">{t.location}</p>}
-                  <div className="mt-2 flex items-center gap-2">
-                    <div className="flex-1 bg-cream-200 dark:bg-stone-700 rounded-full h-1.5 overflow-hidden">
+                  {t.location && <p className="text-[9px] sm:text-[10px] text-stone-400 mt-0.5 truncate">{t.location}</p>}
+                  <div className="mt-1.5 sm:mt-2 flex items-center gap-1.5 sm:gap-2">
+                    <div className="flex-1 bg-cream-200 dark:bg-stone-700 rounded-full h-1 sm:h-1.5 overflow-hidden">
                       <div
                         className={clsx("h-full rounded-full transition-all duration-500",
                           t.remainingSeats === 0 ? "bg-red-500" :
@@ -201,16 +204,17 @@ export default function Tables() {
                         style={{ width: `${((t.capacity - (t.remainingSeats || 0)) / (t.capacity || 1)) * 100}%` }}
                       />
                     </div>
-                    <span className={clsx("text-[10px] font-bold min-w-[3rem] text-right",
+                    <span className={clsx("text-[9px] sm:text-[10px] font-bold min-w-[2.5rem] sm:min-w-[3rem] text-right",
                       t.remainingSeats === 0 ? "text-red-500" : "text-stone-500")}>
                       {t.remainingSeats !== undefined ? `${t.remainingSeats} left` : ""}
                     </span>
                   </div>
                 </div>
 
-                <button onClick={() => openQr(t)} className="mt-2 w-full flex items-center justify-center gap-1 py-1.5 rounded-lg bg-white/50 dark:bg-black/20 hover:bg-white/70 transition-colors">
-                  <QrCode size={11} className="text-stone-400" />
-                  <span className="text-[10px] text-stone-500 font-medium">QR Code</span>
+                <button onClick={() => openQr(t)} className="mt-2 sm:mt-3 w-full flex items-center justify-center gap-1 py-1.5 sm:py-2 rounded-lg bg-white/50 dark:bg-black/20 hover:bg-white/70 transition-colors">
+                  <QrCode size={10} className="sm:hidden text-stone-400" />
+                  <QrCode size={11} className="hidden sm:block text-stone-400" />
+                  <span className="text-[9px] sm:text-[10px] text-stone-500 font-medium">QR</span>
                 </button>
               </div>
             );
