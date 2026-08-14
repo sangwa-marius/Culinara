@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { ShoppingCart, Bell, Menu, X, LogOut, Settings, Package,
-         LayoutDashboard, CheckCheck, Sun, Moon, ChevronDown, ExternalLink } from "lucide-react";
+import { ShoppingCart, Bell, Menu, X, LogOut, Settings, Package,LayoutDashboard, CheckCheck, Sun, Moon, ChevronDown, ExternalLink } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
 import { useTheme } from "../context/ThemeContext";
 import { useNotificationContext } from "../context/NotificationContext";
 import { formatDistanceToNow } from "date-fns";
+import SafeAvatar from "./SafeImage";
 import clsx from "clsx";
 
 export default function Navbar() {
@@ -45,66 +45,80 @@ export default function Navbar() {
     return "/profile";
   };
 
+  const isLoggedOut = !user;
   const transparent = isHome && !scrolled;
 
   return (
     <nav className={clsx(
       "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-      transparent
-        ? "bg-transparent"
-        : "bg-white/95 dark:bg-stone-950/95 backdrop-blur-xl border-b border-cream-300 dark:border-stone-800 shadow-sm"
+      isLoggedOut
+        ? "bg-white/70 dark:bg-stone-900/70 backdrop-blur-xl border-b border-white/30 dark:border-stone-700/30"
+        : transparent
+          ? "bg-transparent"
+          : "bg-white/95 dark:bg-stone-950/95 backdrop-blur-xl border-b border-cream-300 dark:border-stone-800 shadow-sm"
     )}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
+      <div className={clsx(
+        "mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between",
+        isLoggedOut ? "max-w-6xl py-3" : "max-w-7xl h-16"
+      )}>
 
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 group">
           <span className="text-xl transition-transform duration-300 group-hover:scale-110">🍽️</span>
           <span className={clsx(
             "font-display font-bold text-xl tracking-tight transition-colors",
-            transparent ? "text-white" : "text-stone-900 dark:text-white"
+            isLoggedOut ? "text-stone-900 dark:text-white" : transparent ? "text-white" : "text-stone-900 dark:text-white"
           )}>
             Culinara
           </span>
         </Link>
 
         {/* Desktop nav */}
-        <div className="hidden md:flex items-center gap-1">
-          {[
-            { to: "/restaurants", label: "Explore" },
-            { to: "/subscriptions", label: "Pricing" },
-            ...(user ? [{ to: "/orders", label: "Orders" }] : []),
-          ].map(({ to, label }) => (
-            <Link key={to} to={to} className={clsx(
-              "px-4 py-2 rounded-lg text-sm font-medium transition-all",
-              location.pathname === to
-                ? "text-primary-500 bg-primary-50 dark:bg-primary-950/30"
-                : transparent
-                  ? "text-white/80 hover:text-white hover:bg-white/10"
-                  : "text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-white hover:bg-cream-200 dark:hover:bg-stone-800"
-            )}>{label}</Link>
-          ))}
-        </div>
+        {user && (
+          <div className="hidden md:flex items-center gap-1">
+            {[
+              { to: "/restaurants", label: "Explore" },
+              { to: "/subscriptions", label: "Pricing" },
+              { to: "/orders", label: "Orders" },
+            ].map(({ to, label }) => (
+              <Link key={to} to={to} className={clsx(
+                "px-4 py-2 rounded-lg text-sm font-medium transition-all",
+                location.pathname === to
+                  ? "text-primary-500 bg-primary-50 dark:bg-primary-950/30"
+                  : transparent
+                    ? "text-white/80 hover:text-white hover:bg-white/10"
+                    : "text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-white hover:bg-cream-200 dark:hover:bg-stone-800"
+              )}>{label}</Link>
+            ))}
+          </div>
+        )}
 
         {/* Right side */}
         <div className="flex items-center gap-1" ref={dropRef}>
           <button onClick={toggleTheme} className={clsx(
             "p-2.5 rounded-lg transition-all",
-            transparent ? "text-white/70 hover:text-white hover:bg-white/10" : "text-stone-500 hover:text-stone-900 dark:text-stone-400 hover:bg-cream-200 dark:hover:bg-stone-800"
+            isLoggedOut
+              ? "text-stone-700 hover:text-stone-900 dark:text-stone-200 dark:hover:text-white hover:bg-white/60 dark:hover:bg-stone-800/60"
+              : transparent
+                ? "text-white/70 hover:text-white hover:bg-white/10"
+                : "text-stone-500 hover:text-stone-900 dark:text-stone-400 hover:bg-cream-200 dark:hover:bg-stone-800"
           )}>
             {theme === "dark" ? <Sun size={18} className="text-amber-400" /> : <Moon size={18} />}
           </button>
 
-          <Link to="/cart" className={clsx(
-            "relative p-2.5 rounded-lg transition-all",
-            transparent ? "text-white/70 hover:text-white hover:bg-white/10" : "text-stone-500 hover:text-stone-900 dark:text-stone-400 hover:bg-cream-200 dark:hover:bg-stone-800"
-          )}>
-            <ShoppingCart size={18} />
-            {totalItems > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 bg-primary-500 text-white text-[10px] min-w-[17px] h-[17px] px-0.5 rounded-full flex items-center justify-center font-bold">
-                {totalItems}
-              </span>
-            )}
-          </Link>
+          {user && (
+            <Link to="/cart" className={clsx(
+              "relative p-2.5 rounded-lg transition-all",
+              transparent ? "text-white/70 hover:text-white hover:bg-white/10" : "text-stone-500 hover:text-stone-900 dark:text-stone-400 hover:bg-cream-200 dark:hover:bg-stone-800"
+            )}>
+              <ShoppingCart size={18} />
+              {totalItems > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 bg-primary-500 text-white text-[10px] min-w-[17px] h-[17px] px-0.5 rounded-full flex items-center justify-center font-bold">
+                    {totalItems > 9 ? "9+" : totalItems}
+                  </span>
+              )}
+            </Link>
+          )}
 
           {user ? (
             <>
@@ -128,7 +142,7 @@ export default function Navbar() {
                     <div className="px-4 py-3 border-b border-cream-300 dark:border-stone-700 flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <span className="font-semibold text-stone-900 dark:text-white text-sm">Notifications</span>
-                        {unreadCount > 0 && <span className="bg-red-100 text-red-600 text-[10px] font-bold px-1.5 py-0.5 rounded-full">{unreadCount} new</span>}
+                         {unreadCount > 0 && <span className="bg-red-100 text-red-600 text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">{unreadCount > 9 ? "9+" : unreadCount}</span>}
                       </div>
                       {unreadCount > 0 && (
                         <button onClick={markAllRead} className="text-xs text-primary-500 font-semibold flex items-center gap-1 hover:text-primary-600">
@@ -166,8 +180,8 @@ export default function Navbar() {
               <div className="relative ml-1">
                 <button onClick={() => { setDropOpen(!dropOpen); setNotifOpen(false); }}
                   className={clsx("flex items-center gap-2 px-2 py-1.5 rounded-lg transition-all", transparent ? "hover:bg-white/10" : "hover:bg-cream-200 dark:hover:bg-stone-800")}>
-                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white font-bold text-xs ring-2 ring-white dark:ring-stone-900">
-                    {user.name?.charAt(0).toUpperCase()}
+                  <div className="w-7 h-7 rounded-full overflow-hidden ring-2 ring-white dark:ring-stone-900">
+                    <SafeAvatar src={user?.avatar} name={user?.name} size="w-7 h-7" textSize="text-xs" />
                   </div>
                   <span className={clsx("hidden md:block text-sm font-medium", transparent ? "text-white/90" : "text-stone-700 dark:text-stone-200")}>
                     {user.name?.split(" ")[0]}
@@ -203,15 +217,22 @@ export default function Navbar() {
           ) : (
             <div className="hidden md:flex items-center gap-2 ml-2">
               <Link to="/login" className={clsx("px-4 py-2 text-sm font-medium rounded-lg transition-all",
-                transparent ? "text-white/80 hover:text-white hover:bg-white/10" : "text-stone-600 hover:bg-cream-200 dark:text-stone-300 dark:hover:bg-stone-800")}>
+                isLoggedOut
+                  ? "text-stone-700 hover:bg-white/60 dark:text-stone-100 dark:hover:bg-stone-800/60"
+                  : transparent
+                    ? "text-white/80 hover:text-white hover:bg-white/10"
+                    : "text-stone-600 hover:bg-cream-200 dark:text-stone-300 dark:hover:bg-stone-800")}>
                 Sign In
               </Link>
-              <Link to="/register" className="btn-primary text-sm py-2 px-4">Request Demo</Link>
+              <Link to="/register" className={clsx("btn-primary text-sm py-2 px-4",
+                isLoggedOut && "bg-primary-600 hover:bg-primary-700 text-white")}>Sign Up</Link>
             </div>
           )}
 
           <button className={clsx("md:hidden p-2.5 rounded-lg transition-all ml-1",
-            transparent ? "text-white/70 hover:bg-white/10" : "text-stone-600 hover:bg-cream-200 dark:hover:bg-stone-800"
+            isLoggedOut
+              ? "text-stone-700 hover:bg-white/60 dark:text-stone-100 dark:hover:bg-stone-800/60"
+              : transparent ? "text-white/70 hover:bg-white/10" : "text-stone-600 hover:bg-cream-200 dark:hover:bg-stone-800"
           )} onClick={() => setMenuOpen(!menuOpen)}>
             {menuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
@@ -220,18 +241,24 @@ export default function Navbar() {
 
       {/* Mobile menu */}
       {menuOpen && (
-        <div className="md:hidden bg-white dark:bg-stone-950 border-t border-cream-300 dark:border-stone-800 px-4 py-3 space-y-1 animate-slide-down">
-          {[
+        <div className={clsx("md:hidden border-t px-4 py-3 space-y-1 animate-slide-down",
+          isLoggedOut
+            ? "bg-white/80 dark:bg-stone-900/80 backdrop-blur-xl border-white/30 dark:border-stone-700/30"
+            : "bg-white dark:bg-stone-950 border-cream-300 dark:border-stone-800")}>
+          {user && [
             { to: "/restaurants", label: "Explore" },
             { to: "/subscriptions", label: "Pricing" },
-            ...(user ? [
-              { to: "/orders",    label: "My Orders" },
-              { to: getDashLink(), label: "Dashboard" },
-              { to: "/profile",   label: "Profile" },
-            ] : [
-              { to: "/login",    label: "Sign In" },
-              { to: "/register", label: "Get Started" },
-            ]),
+            { to: "/orders",    label: "My Orders" },
+            { to: getDashLink(), label: "Dashboard" },
+            { to: "/profile",   label: "Profile" },
+          ].map(({ to, label }) => (
+            <Link key={to} to={to} className="block px-3 py-2.5 text-sm font-medium text-stone-700 dark:text-stone-300 hover:bg-cream-200 dark:hover:bg-stone-800 rounded-lg transition-colors">
+              {label}
+            </Link>
+          ))}
+          {!user && [
+            { to: "/login",    label: "Sign In" },
+            { to: "/register", label: "Sign Up" },
           ].map(({ to, label }) => (
             <Link key={to} to={to} className="block px-3 py-2.5 text-sm font-medium text-stone-700 dark:text-stone-300 hover:bg-cream-200 dark:hover:bg-stone-800 rounded-lg transition-colors">
               {label}
