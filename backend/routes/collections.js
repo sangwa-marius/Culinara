@@ -13,14 +13,21 @@ const verifyOwner = async (restaurantId, userId, role) => {
   return true;
 };
 
-// GET all collections for a restaurant
-router.get("/:restaurantId", protect, async (req, res) => {
+// GET all collections for a restaurant (public for customers, protected for management)
+router.get("/:restaurantId", async (req, res) => {
   try {
-    const collections = await MenuCollection.find({ restaurant: req.params.restaurantId })
-      .populate("items", "name price category image isAvailable")
+    const isCustomer = !req.user || ["customer", "delivery_driver"].includes(req.user?.role);
+    const query = { restaurant: req.params.restaurantId };
+    if (isCustomer) query.status = "active";
+    const collections = await MenuCollection.find(query)
+      .populate("items", "name price category image isAvailable description")
       .sort({ sortOrder: 1, createdAt: -1 })
       .lean();
-    res.json({ success: true, collections });
+    const cleaned = collections.map(col => ({
+      ...col,
+      items: (col.items || []).filter(it => it.isAvailable !== false),
+    }));
+    res.json({ success: true, collections: cleaned });
   } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
