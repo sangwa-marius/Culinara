@@ -52,7 +52,7 @@ export default function SafeImage({ src, alt = "", fallback, className = "", img
     const content = fallback ?? <span className="text-5xl">🍽️</span>;
     return (
       <div
-        className={`flex items-center justify-center bg-gradient-to-br from-orange-50 to-red-50 dark:from-gray-800 dark:to-gray-700 ${className}`}
+        className={`flex items-center justify-center bg-cream-900  dark:bg-stone-800 ${className}`}
         style={style}
       >
         {content}
