@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Plus, Pencil, Trash2, Eye, EyeOff, X, Image, Layers } from "lucide-react";
-import Spinner from "../../components/Spinner";
+import { MenuCardSkeleton, Skeleton } from "../../components/Skeleton";
 import ImageUploader from "../../components/ImageUploader";
 import ConfirmDialog from "../../components/ConfirmDialog";
 import { restaurantAPI, collectionAPI, menuAPI } from "../../services/api";
@@ -126,7 +126,23 @@ export default function MenuCollections() {
     ? collections
     : collections.filter(c => c.status === tab.toLowerCase());
 
-  if (loading) return <div className="flex items-center justify-center py-20"><Spinner /></div>;
+  if (loading) return (
+    <div className="p-4 sm:p-6 space-y-4 sm:space-y-5">
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <div className="space-y-2">
+          <Skeleton className="h-7 w-44" />
+          <Skeleton className="h-4 w-56" />
+        </div>
+        <Skeleton className="h-10 w-36 rounded-lg" />
+      </div>
+      <div className="flex gap-1 bg-cream-200 dark:bg-stone-800 rounded-xl p-1 w-fit">
+        {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-8 w-16 rounded-lg" />)}
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {Array.from({ length: 3 }).map((_, i) => <MenuCardSkeleton key={i} />)}
+      </div>
+    </div>
+  );
 
   return (
     <div className="p-6 space-y-5">
@@ -250,8 +266,9 @@ export default function MenuCollections() {
 
       {/* Create / Edit Modal */}
       {modal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="card w-full max-w-2xl max-h-[90vh] flex flex-col animate-scale-in shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setModal(false)} />
+          <div className="relative w-full max-w-2xl max-h-[90vh] flex flex-col bg-white dark:bg-stone-900 border border-cream-300 dark:border-stone-700 rounded-2xl shadow-2xl animate-slide-up mx-4">
             {/* Modal header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-cream-300 dark:border-stone-800 shrink-0">
               <h3 className="font-bold text-stone-900 dark:text-white">
