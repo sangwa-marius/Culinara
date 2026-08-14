@@ -115,8 +115,8 @@ export default function NotificationsPage() {
       {/* Confirm Clear All Dialog */}
       {confirmClearAll && (
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setConfirmClearAll(false)} />
-          <div className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 w-full max-w-sm">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setConfirmClearAll(false)} />
+          <div className="relative bg-white dark:bg-stone-900 border border-cream-300 dark:border-stone-700 rounded-2xl shadow-2xl p-6 w-full max-w-sm animate-slide-up">
             <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
               <Trash2 size={22} className="text-red-500 dark:text-red-400" />
             </div>
@@ -209,18 +209,18 @@ export default function NotificationsPage() {
                   "flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all",
                   activeFilter === tab.key
                     ? "bg-primary-500 text-white shadow-sm"
-                    : "bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:border-gray-300 dark:hover:border-gray-500"
+                    : "bg-white dark:bg-stone-800 border border-cream-300 dark:border-stone-700 text-gray-600 dark:text-gray-300 hover:border-umber-300 dark:hover:border-primary-500"
                 )}
               >
                 {tab.label}
                 {count > 0 && (
                   <span className={clsx(
-                    "text-xs px-1.5 py-0.5 rounded-full font-bold",
+                    "w-3.5 h-3.5 rounded-full flex items-center justify-center text-[8px] font-bold",
                     activeFilter === tab.key
                       ? "bg-white/25 text-white"
                       : "bg-primary-100 dark:bg-primary-900/40 text-primary-600 dark:text-primary-400"
                   )}>
-                    {count}
+                    {count > 9 ? "9+" : count}
                   </span>
                 )}
               </button>
@@ -236,8 +236,8 @@ export default function NotificationsPage() {
           </div>
         ) : filtered.length === 0 ? (
           <div className="card p-16 text-center">
-            <div className="text-6xl mb-4">🔔</div>
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+            <div className="mb-4">< Bell size={70} className="m-auto text-stone-500 animate-pulse"/></div>
+            <h3 className="text-xl font-bold text-gray-500 dark:text-white mb-2">
               {activeFilter === "all" ? "No notifications yet" : `No ${activeFilter} notifications`}
             </h3>
             <p className="text-gray-500 dark:text-gray-400">
