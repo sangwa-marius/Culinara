@@ -4,11 +4,12 @@ import { DollarSign, Package, TrendingUp, Users, Truck } from "lucide-react";
 import { analyticsAPI, restaurantAPI, orderAPI } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 import { joinRestaurantRoom, getSocket } from "../../utils/socket";
-import Spinner from "../../components/Spinner";
+import { AnalyticsSkeleton } from "../../components/Skeleton";
 import toast from "react-hot-toast";
 import {
   BarChart, Bar, PieChart, Pie, Cell, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
 } from "recharts";
+import { isToday } from "date-fns";
 
 const COLORS = ["#B5390D", "#f59e0b", "#10b981", "#3b82f6", "#8b5cf6", "#ec4899"];
 
@@ -49,7 +50,7 @@ export default function RestaurantAnalytics() {
     } catch (err) { console.error("Failed to fetch orders:", err); }
   };
 
-  if (loading) return <div className="flex items-center justify-center py-20"><Spinner /></div>;
+  if (loading) return <AnalyticsSkeleton />;
 
   const data = analytics || {};
   const totalRevenue = data.totalRevenue || 0;
@@ -71,12 +72,10 @@ export default function RestaurantAnalytics() {
     value: item.count,
   }));
 
-  const today = new Date();
-  const todayStr = today.toISOString().split("T")[0];
   const todayRevenue = orders
-    .filter(o => o.paymentStatus === "paid" && o.createdAt?.startsWith(todayStr))
+    .filter(o => o.paymentStatus === "paid" && isToday(new Date(o.createdAt)))
     .reduce((s, o) => s + o.total, 0);
-  const todayOrders = orders.filter(o => o.createdAt?.startsWith(todayStr)).length;
+  const todayOrders = orders.filter(o => isToday(new Date(o.createdAt))).length;
 
   return (
     <div className="p-6 space-y-6">
