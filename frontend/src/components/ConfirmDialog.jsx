@@ -49,20 +49,20 @@ export default function ConfirmDialog({
 
   return (
     <div
-      className="fixed inset-0 z-[200] flex items-center justify-center p-4"
+      className="fixed inset-0 z-[200] flex items-center justify-center"
       role="dialog"
       aria-modal="true"
       aria-labelledby="confirm-title"
     >
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        className="fixed inset-0 bg-black/40 backdrop-blur-sm"
         onClick={onCancel}
         aria-hidden="true"
       />
 
       {/* Panel */}
-      <div className="relative w-full max-w-sm card p-6 animate-scale-in shadow-2xl shadow-black/20">
+      <div className="relative bg-white dark:bg-stone-900 border border-cream-300 dark:border-stone-700 rounded-2xl shadow-2xl p-6 w-full max-w-sm animate-slide-up mx-4">
         {/* Close button */}
         <button
           onClick={onCancel}
