@@ -15,21 +15,21 @@ export default function Cart() {
 
   if (cartItems.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-24 flex flex-col items-center justify-center text-center px-4">
-        <div className="text-8xl mb-6">🛒</div>
-        <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-3">Your cart is empty</h2>
-        <p className="text-gray-500 mb-8">Browse restaurants and add some delicious items!</p>
+      <div className="flex flex-col items-center justify-center text-center px-4 py-20 mt-20">
+        <div className="text-8xl mt-30 mb-6">🛒</div>
+        <h2 className="text-3xl font-bold text-stone-900 dark:text-white mb-3">Your cart is empty</h2>
+        <p className="text-stone-500 mb-8">Browse restaurants and add some delicious items!</p>
         <Link to="/restaurants" className="btn-primary">Browse Restaurants</Link>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-20 px-4 pb-16">
+    <div className="px-4 pb-16">
       <div className="max-w-4xl mx-auto py-8">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Your Cart</h1>
+        <h1 className="text-3xl font-bold text-stone-900 dark:text-white mb-2">Your Cart</h1>
         {cartRestaurant && (
-          <p className="text-gray-500 mb-8">
+          <p className="text-stone-500 mb-8">
             From{" "}
             <Link to={`/restaurants/${cartRestaurant._id}`} className="text-primary-500 font-medium hover:underline">
               {cartRestaurant.name}
@@ -46,7 +46,7 @@ export default function Cart() {
 
               return (
                 <div key={item.cartKey} className="card p-4 flex gap-4">
-                  <div className="w-20 h-20 rounded-xl bg-gray-100 dark:bg-gray-700 overflow-hidden shrink-0">
+                  <div className="w-20 h-20 rounded-xl bg-cream-200 dark:bg-stone-800 overflow-hidden shrink-0">
                     <SafeImage
                       src={item.image}
                       alt={item.name}
@@ -56,24 +56,24 @@ export default function Cart() {
                     />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-gray-900 dark:text-white">{item.name}</h3>
+                    <h3 className="font-semibold text-stone-900 dark:text-white">{item.name}</h3>
                     {item.customizations.length > 0 && (
-                      <p className="text-xs text-gray-400 mt-0.5">{item.customizations.map((c) => c.selected).join(", ")}</p>
+                      <p className="text-xs text-stone-400 mt-0.5">{item.customizations.map((c) => c.selected).join(", ")}</p>
                     )}
                     <p className="text-primary-500 font-bold mt-1">${itemPrice.toFixed(2)}</p>
                   </div>
                   <div className="flex flex-col items-end gap-2 shrink-0">
-                    <button onClick={() => removeFromCart(item.cartKey)} className="text-gray-300 hover:text-red-400 transition-colors">
+                    <button onClick={() => removeFromCart(item.cartKey)} className="text-stone-300 hover:text-red-400 transition-colors">
                       <Trash2 size={16} />
                     </button>
-                    <div className="flex items-center gap-2 bg-gray-50 dark:bg-gray-900 rounded-lg p-1">
+                    <div className="flex items-center gap-2 bg-cream-50 dark:bg-stone-900 rounded-lg p-1">
                       <button
                         onClick={() => updateQuantity(item.cartKey, item.quantity - 1)}
-                        className="w-7 h-7 rounded-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700"
+                        className="w-7 h-7 rounded-md bg-white dark:bg-stone-800 border border-cream-300 dark:border-stone-700 flex items-center justify-center hover:bg-cream-100 dark:hover:bg-stone-700"
                       >
                         <Minus size={13} />
                       </button>
-                      <span className="font-bold text-gray-800 dark:text-gray-100 min-w-[1.5rem] text-center">{item.quantity}</span>
+                      <span className="font-bold text-stone-800 dark:text-stone-100 min-w-[1.5rem] text-center">{item.quantity}</span>
                       <button
                         onClick={() => updateQuantity(item.cartKey, item.quantity + 1)}
                         className="w-7 h-7 rounded-md bg-primary-500 text-white flex items-center justify-center hover:bg-primary-600"
@@ -81,7 +81,7 @@ export default function Cart() {
                         <Plus size={13} />
                       </button>
                     </div>
-                    <p className="text-sm font-semibold text-gray-700 dark:text-gray-200">${(itemPrice * item.quantity).toFixed(2)}</p>
+                    <p className="text-sm font-semibold text-stone-700 dark:text-stone-200">${(itemPrice * item.quantity).toFixed(2)}</p>
                   </div>
                 </div>
               );
@@ -95,21 +95,21 @@ export default function Cart() {
           {/* Order Summary */}
           <div className="lg:col-span-1">
             <div className="card p-6 sticky top-24">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Order Summary</h2>
+              <h2 className="text-xl font-bold text-stone-900 dark:text-white mb-6">Order Summary</h2>
               <div className="space-y-3 text-sm">
-                <div className="flex justify-between text-gray-600 dark:text-gray-300">
+                <div className="flex justify-between text-stone-600 dark:text-stone-300">
                   <span>Subtotal</span>
                   <span>${subtotal.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-gray-600 dark:text-gray-300">
+                <div className="flex justify-between text-stone-600 dark:text-stone-300">
                   <span>Delivery fee</span>
                   <span>{deliveryFee === 0 ? "Free" : `$${deliveryFee.toFixed(2)}`}</span>
                 </div>
-                <div className="flex justify-between text-gray-600 dark:text-gray-300">
+                <div className="flex justify-between text-stone-600 dark:text-stone-300">
                   <span>Tax (10%)</span>
                   <span>${tax.toFixed(2)}</span>
                 </div>
-                <div className="border-t border-gray-100 dark:border-gray-700 pt-3 flex justify-between font-bold text-lg text-gray-900 dark:text-white">
+                <div className="border-t border-cream-200 dark:border-stone-700 pt-3 flex justify-between font-bold text-lg text-stone-900 dark:text-white">
                   <span>Total</span>
                   <span className="text-primary-500">${total.toFixed(2)}</span>
                 </div>
@@ -117,7 +117,7 @@ export default function Cart() {
 
               {!user ? (
                 <div className="mt-6 space-y-3">
-                  <p className="text-sm text-gray-500 dark:text-gray-400 text-center">Login to place your order</p>
+                  <p className="text-sm text-stone-500 dark:text-stone-400 text-center">Login to place your order</p>
                   <Link to="/login" state={{ from: { pathname: "/cart" } }} className="btn-primary w-full block text-center">
                     Login to Order
                   </Link>
@@ -131,7 +131,7 @@ export default function Cart() {
                 </button>
               )}
 
-              <Link to="/restaurants" className="block text-center text-sm text-gray-500 dark:text-gray-400 hover:text-primary-500 mt-4">
+              <Link to="/restaurants" className="block text-center text-sm text-stone-500 dark:text-stone-400 hover:text-primary-500 mt-4">
                 + Add more items
               </Link>
             </div>
