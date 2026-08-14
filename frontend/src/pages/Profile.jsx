@@ -3,6 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import { authAPI } from "../services/api";
 import { User, Mail, Phone, Lock, Save } from "lucide-react";
 import ImageUploader from "../components/ImageUploader";
+import SafeAvatar from "../components/SafeImage";
 import toast from "react-hot-toast";
 
 export default function Profile() {
@@ -43,10 +44,8 @@ export default function Profile() {
         <div className="card p-6 mb-5">
           <div className="flex items-center gap-5">
             {/* Live avatar preview — shows uploaded photo or initials fallback */}
-            <div className="w-20 h-20 rounded-full overflow-hidden bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white text-2xl font-bold shrink-0">
-              {form.avatar
-                ? <img src={form.avatar} alt={user?.name} className="w-full h-full object-cover" onError={e => e.target.style.display="none"} />
-                : user?.name?.charAt(0).toUpperCase()}
+            <div className="w-20 h-20 rounded-full overflow-hidden shrink-0">
+              <SafeAvatar src={form.avatar || user?.avatar} name={user?.name} size="w-20 h-20" textSize="text-2xl" />
             </div>
             <div className="flex-1 min-w-0">
               <p className="font-semibold text-stone-900 dark:text-white">{user?.name}</p>
