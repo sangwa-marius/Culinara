@@ -5,7 +5,8 @@ import { orderAPI, restaurantAPI, driverAPI } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 import { joinRestaurantRoom, getSocket } from "../../utils/socket";
 import OrderStatusBadge from "../../components/OrderStatusBadge";
-import Spinner from "../../components/Spinner";
+import { OrderRowSkeleton, Skeleton } from "../../components/Skeleton";
+import SafeAvatar from "../../components/SafeImage";
 import toast from "react-hot-toast";
 import { format } from "date-fns";
 import clsx from "clsx";
@@ -161,7 +162,27 @@ export default function RestaurantOrders() {
 
   const filtered = activeTab === "all" ? orders : orders.filter(o => o.status === activeTab);
 
-  if (loading) return <div className="flex items-center justify-center py-20"><Spinner /></div>;
+  if (loading) return (
+    <div className="p-4 sm:p-6 space-y-4 sm:space-y-5">
+      <div className="flex items-center justify-between">
+        <div className="space-y-2">
+          <Skeleton className="h-7 w-32" />
+          <Skeleton className="h-4 w-48" />
+        </div>
+        <Skeleton className="h-5 w-16" />
+      </div>
+      <div className="card overflow-hidden">
+        <div className="px-4 sm:px-5 py-2.5 sm:py-3 border-b border-cream-300 dark:border-stone-800 flex gap-1.5">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Skeleton key={i} className="h-7 w-16 rounded-lg" />
+          ))}
+        </div>
+        <div className="divide-y divide-cream-200 dark:divide-stone-800">
+          {Array.from({ length: 6 }).map((_, i) => <OrderRowSkeleton key={i} />)}
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <div className="p-4 sm:p-6 space-y-4 sm:space-y-5">
@@ -258,9 +279,9 @@ export default function RestaurantOrders() {
 
       {/* Order Detail Modal */}
       {selectedOrder && (
-        <div className="fixed inset-0 z-[160] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setSelectedOrder(null)} />
-          <div className="relative w-full max-w-lg card p-6 animate-scale-in shadow-2xl shadow-black/20 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-[160] flex items-center justify-center">
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setSelectedOrder(null)} />
+           <div className="relative w-full max-w-lg bg-white dark:bg-stone-900 border border-cream-300 dark:border-stone-700 rounded-2xl shadow-2xl p-6 animate-slide-up max-h-[90vh] overflow-y-auto mx-4">
             <div className="flex items-center justify-between mb-5">
               <div className="flex items-center gap-3">
                 <h3 className="font-bold text-stone-900 dark:text-white text-lg">Order #{selectedOrder.orderNumber}</h3>
@@ -359,15 +380,16 @@ export default function RestaurantOrders() {
       )}
 
       {notifyId && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="card w-full max-w-md p-6 animate-scale-in">
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setNotifyId(null)} />
+          <div className="relative w-full max-w-md bg-white dark:bg-stone-900 border border-cream-300 dark:border-stone-700 rounded-2xl shadow-2xl p-6 animate-slide-up mx-4">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-bold text-stone-900 dark:text-white">Assign Driver</h3>
               <button onClick={() => setNotifyId(null)} className="p-1.5 rounded-lg text-stone-400 hover:text-stone-600 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors">
                 <X size={17} />
               </button>
             </div>
-            {notifyLoad ? <Spinner center /> : drivers.length === 0 ? (
+            {notifyLoad ? <div className="py-8"><Skeleton className="h-8 w-8 rounded-full mx-auto" /></div> : drivers.length === 0 ? (
               <p className="text-stone-400 text-center py-6 text-sm">No available drivers</p>
             ) : (
               <div className="space-y-2 mb-4 max-h-60 overflow-y-auto">
@@ -377,9 +399,9 @@ export default function RestaurantOrders() {
                       selDriver === d._id ? "border-primary-500 bg-primary-50 dark:bg-primary-950/20" : "border-cream-300 dark:border-stone-700")}>
                     <input type="radio" name="driver" value={d._id} checked={selDriver === d._id}
                       onChange={() => setSelDriver(d._id)} className="accent-primary-500" />
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white font-bold text-xs">
-                      {d.name?.charAt(0)}
-                    </div>
+                     <div className="w-8 h-8 rounded-full overflow-hidden">
+                       <SafeAvatar src={d.avatar} name={d.name} size="w-8 h-8" textSize="text-xs" />
+                     </div>
                     <div>
                       <p className="text-sm font-semibold text-stone-900 dark:text-white">{d.name}</p>
                       <p className="text-xs text-stone-400">{d.phone || "No phone"}</p>
