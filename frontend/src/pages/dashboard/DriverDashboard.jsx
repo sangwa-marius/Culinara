@@ -7,7 +7,7 @@ import { useAuth } from "../../context/AuthContext";
 import { getSocket } from "../../utils/socket";
 import OrderStatusBadge from "../../components/OrderStatusBadge";
 import ConfirmDialog from "../../components/ConfirmDialog";
-import Spinner from "../../components/Spinner";
+import { StatCardSkeleton, CardSkeleton, OrderRowSkeleton, Skeleton } from "../../components/Skeleton";
 import toast from "react-hot-toast";
 import { format } from "date-fns";
 import clsx from "clsx";
@@ -123,7 +123,25 @@ export default function DriverDashboard() {
     { key: "history",    label: "History",       count: history.length },
   ];
 
-  if (loading) return <div className="flex items-center justify-center py-20"><Spinner /></div>;
+  if (loading) return (
+    <div className="p-4 sm:p-6 space-y-4 sm:space-y-5">
+      <div className="space-y-2">
+        <Skeleton className="h-7 w-36" />
+        <Skeleton className="h-4 w-48" />
+      </div>
+      <div className="grid grid-cols-3 gap-3 sm:gap-4">
+        {Array.from({ length: 3 }).map((_, i) => <StatCardSkeleton key={i} />)}
+      </div>
+      <div className="card overflow-hidden">
+        <div className="px-4 sm:px-5 py-2.5 sm:py-3 border-b border-cream-300 dark:border-stone-800 flex gap-1.5">
+          {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-8 w-20 rounded-lg" />)}
+        </div>
+        <div className="divide-y divide-cream-200 dark:divide-stone-800">
+          {Array.from({ length: 4 }).map((_, i) => <OrderRowSkeleton key={i} />)}
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <div className="p-6 space-y-5">
@@ -170,9 +188,9 @@ export default function DriverDashboard() {
                   : "border-transparent text-stone-400 hover:text-stone-700 dark:hover:text-stone-200")}>
               {t.label}
               {t.count > 0 && (
-                <span className={clsx("ml-2 text-xs px-1.5 py-0.5 rounded-full font-bold",
+                <span className={clsx("ml-2 w-3.5 h-3.5 rounded-full flex items-center justify-center text-[8px] font-bold",
                   tab === t.key ? "bg-primary-500 text-white" : "bg-stone-100 dark:bg-stone-800 text-stone-500")}>
-                  {t.count}
+                  {t.count > 9 ? "9+" : t.count}
                 </span>
               )}
             </button>
@@ -231,8 +249,9 @@ export default function DriverDashboard() {
 
       {/* ── Delivery Request Popup ── */}
       {requestOrder && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="card w-full max-w-md animate-scale-in shadow-2xl overflow-hidden">
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setRequestOrder(null)} />
+          <div className="relative w-full max-w-md bg-white dark:bg-stone-900 border border-cream-300 dark:border-stone-700 rounded-2xl shadow-2xl animate-slide-up overflow-hidden mx-4">
 
             {/* Header */}
             <div className="bg-primary-500 px-5 py-4 flex items-center justify-between">
@@ -248,8 +267,8 @@ export default function DriverDashboard() {
 
             {requestOrder._loading ? (
               <div className="p-10 flex flex-col items-center gap-3">
-                <Spinner />
-                <p className="text-stone-400 text-sm">Loading order details…</p>
+                <Skeleton className="w-8 h-8 rounded-full" />
+                <Skeleton className="h-4 w-40" />
               </div>
             ) : (
               <div className="p-5 space-y-4">
