@@ -4,7 +4,7 @@ import { Package, ChevronRight, Trash2, X } from "lucide-react";
 import { orderAPI } from "../services/api";
 import OrderStatusBadge from "../components/OrderStatusBadge";
 import SafeImage from "../components/SafeImage";
-import Spinner from "../components/Spinner";
+import { OrderRowSkeleton, CardSkeleton, Skeleton } from "../components/Skeleton";
 import { format } from "date-fns";
 import toast from "react-hot-toast";
 
@@ -13,24 +13,24 @@ const STATUS_TABS = ["all", "pending", "confirmed", "preparing", "out_for_delive
 /* ── Confirm dialog ── */
 function DeleteConfirmDialog({ order, onConfirm, onCancel, loading }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onCancel} />
-      <div className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 w-full max-w-sm animate-slide-up">
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={onCancel} />
+      <div className="relative bg-white dark:bg-stone-900 border border-cream-300 dark:border-stone-700 rounded-2xl shadow-2xl p-6 w-full max-w-sm animate-slide-up mx-4">
         <button
           onClick={onCancel}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+          className="absolute top-4 right-4 text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 transition-colors"
         >
           <X size={18} />
         </button>
-        <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+        <div className="w-12 h-12 bg-red-50 dark:bg-red-950/30 rounded-full flex items-center justify-center mx-auto mb-4">
           <Trash2 size={22} className="text-red-500 dark:text-red-400" />
         </div>
-        <h3 className="text-lg font-bold text-gray-900 dark:text-white text-center mb-1">Remove this order?</h3>
-        <p className="text-sm text-gray-500 dark:text-gray-400 text-center mb-1">
-          Order <strong className="text-gray-700 dark:text-gray-200">#{order.orderNumber}</strong> from{" "}
-          <strong className="text-gray-700 dark:text-gray-200">{order.restaurant?.name}</strong>
+        <h3 className="text-lg font-bold text-stone-900 dark:text-white text-center mb-1">Remove this order?</h3>
+        <p className="text-sm text-stone-500 dark:text-stone-400 text-center mb-1">
+          Order <strong className="text-stone-700 dark:text-stone-200">#{order.orderNumber}</strong> from{" "}
+          <strong className="text-stone-700 dark:text-stone-200">{order.restaurant?.name}</strong>
         </p>
-        <p className="text-xs text-gray-400 dark:text-gray-500 text-center mb-6">
+        <p className="text-xs text-stone-400 dark:text-stone-500 text-center mb-6">
           This only removes it from your view. The restaurant is unaffected.
         </p>
         <div className="flex gap-3">
@@ -117,7 +117,7 @@ export default function MyOrders() {
               className={`px-4 py-2 rounded-full text-sm whitespace-nowrap font-medium transition-all ${
                 activeTab === tab
                   ? "bg-primary-500 text-white shadow-sm"
-                  : "bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:border-primary-300 dark:hover:border-gray-500"
+                  : "bg-white dark:bg-stone-800 border border-gray-200 dark:border-stone-700 text-gray-600 dark:text-gray-300 hover:border-primary-300 dark:hover:border-primary-500"
               }`}
             >
               {tab === "all"
@@ -128,10 +128,12 @@ export default function MyOrders() {
         </div>
 
         {loading ? (
-          <Spinner center />
+          <div className="space-y-3">
+            {Array.from({ length: 4 }).map((_, i) => <OrderRowSkeleton key={i} />)}
+          </div>
         ) : orders.length === 0 ? (
           <div className="text-center py-24">
-            <Package size={64} className="mx-auto text-gray-300 dark:text-gray-600 mb-4" />
+            <Package size={64} className="mx-auto text-gray-300 dark:text-stone-800 mb-4" />
             <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">No orders yet</h3>
             <p className="text-gray-500 dark:text-gray-400 mb-6">
               Start exploring restaurants and place your first order!
