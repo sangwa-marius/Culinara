@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, ArrowRight, ChevronRight, Star } from "lucide-react";
 import RestaurantCard from "../components/RestaurantCard";
-import Spinner from "../components/Spinner";
+import { RestaurantCardSkeleton, Skeleton } from "../components/Skeleton";
 import { restaurantAPI, adminAPI } from "../services/api";
 
 const CUISINES = [
@@ -165,7 +165,11 @@ export default function Home() {
             </button>
           </div>
 
-          {loading ? <Spinner center /> : featured.length === 0 ? (
+          {loading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {Array.from({ length: 3 }).map((_, i) => <RestaurantCardSkeleton key={i} />)}
+            </div>
+          ) : featured.length === 0 ? (
             <div className="text-center py-20">
               <p className="text-4xl mb-3">🍽️</p>
               <p className="text-stone-500">No restaurants yet</p>
