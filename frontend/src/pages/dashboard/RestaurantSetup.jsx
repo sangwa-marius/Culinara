@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import { restaurantAPI } from "../../services/api";
 import ImageUploader from "../../components/ImageUploader";
-import Spinner from "../../components/Spinner";
+import { Skeleton } from "../../components/Skeleton";
 import toast from "react-hot-toast";
 import clsx from "clsx";
 
@@ -129,7 +129,22 @@ export default function RestaurantSetup() {
     }
   };
 
-  if (fetching) return <div className="flex items-center justify-center py-20"><Spinner /></div>;
+  if (fetching) return (
+    <div className="p-4 sm:p-6 max-w-2xl mx-auto pb-12 space-y-5">
+      <Skeleton className="h-8 w-52" />
+      <div className="flex gap-2">
+        {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-8 w-20 rounded-full" />)}
+      </div>
+      <div className="card p-5 space-y-4">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div key={i} className="space-y-2">
+            <Skeleton className="h-3 w-24" />
+            <Skeleton className="h-10 w-full rounded-lg" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 
   return (
     <div className="p-4 sm:p-6 max-w-2xl mx-auto pb-12">

@@ -21,6 +21,8 @@ const userPayload = (user) => ({
   phone:     user.phone,
   avatar:    user.avatar,
   addresses: user.addresses,
+  createdAt: user.createdAt,
+  updatedAt: user.updatedAt,
 });
 
 // @desc  Register
@@ -66,8 +68,11 @@ const login = async (req, res) => {
       });
     }
 
-    if (!user || !(await user.comparePassword(password)))
-      return res.status(401).json({ success: false, message: "Invalid email or password" });
+    if (!user)
+      return res.status(401).json({ success: false, message: "Email not registered" });
+
+    if (!(await user.comparePassword(password)))
+      return res.status(401).json({ success: false, message: "Invalid password" });
 
     if (!user.isActive)
       return res.status(401).json({ success: false, message: "Account has been deactivated. Contact support." });

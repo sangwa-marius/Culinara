@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { Plus, Pencil, Trash2, QrCode, Users, X, Armchair, CheckCircle } from "lucide-react";
-import Spinner from "../../components/Spinner";
-import ConfirmDialog from "../../components/ConfirmDialog";
-import toast from "react-hot-toast";
 import { restaurantAPI } from "../../services/api";
 import api from "../../services/api";
 import { getSocket, joinRestaurantRoom } from "../../utils/socket";
+import ConfirmDialog from "../../components/ConfirmDialog";
+import toast from "react-hot-toast";
+import { TableCardSkeleton, Skeleton } from "../../components/Skeleton";
 import clsx from "clsx";
 
 const STATUS_CFG = {
@@ -119,7 +119,31 @@ export default function Tables() {
     remaining: tables.reduce((s, t) => s + (t.remainingSeats || 0), 0),
   };
 
-  if (loading) return <div className="flex items-center justify-center py-20"><Spinner /></div>;
+  if (loading) return (
+    <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+      <div className="flex items-center justify-between">
+        <div className="space-y-2">
+          <Skeleton className="h-6 w-40 sm:h-7 sm:w-44" />
+          <Skeleton className="h-3 w-56" />
+        </div>
+        <Skeleton className="h-9 w-24 rounded-lg" />
+      </div>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className="card p-3 sm:p-4 flex items-center gap-2 sm:gap-3">
+            <Skeleton className="w-7 h-7 sm:w-9 sm:h-9 rounded-lg shrink-0" />
+            <div className="space-y-1.5 flex-1">
+              <Skeleton className="h-3 w-16" />
+              <Skeleton className="h-5 w-8" />
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-2 sm:gap-3">
+        {Array.from({ length: 6 }).map((_, i) => <TableCardSkeleton key={i} />)}
+      </div>
+    </div>
+  );
 
   return (
     <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
@@ -224,8 +248,9 @@ export default function Tables() {
 
       {/* Add / Edit Modal */}
       {modal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="card w-full max-w-sm p-6 animate-scale-in">
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setModal(false)} />
+          <div className="relative w-full max-w-sm bg-white dark:bg-stone-900 border border-cream-300 dark:border-stone-700 rounded-2xl shadow-2xl p-6 animate-slide-up mx-4">
             <div className="flex items-center justify-between mb-5">
               <h3 className="font-bold text-stone-900 dark:text-white">{editing ? "Edit Table" : "Add Table"}</h3>
               <button onClick={() => setModal(false)} className="p-1.5 rounded-lg text-stone-400 hover:text-stone-600 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors">
@@ -260,9 +285,9 @@ export default function Tables() {
 
       {/* QR Code Modal */}
       {qrTable && (
-        <div className="fixed inset-0 z-[150] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setQrTable(null)} />
-          <div className="relative w-full max-w-sm card p-6 animate-scale-in shadow-2xl shadow-black/20 text-center">
+        <div className="fixed inset-0 z-[150] flex items-center justify-center">
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setQrTable(null)} />
+           <div className="relative w-full max-w-sm bg-white dark:bg-stone-900 border border-cream-300 dark:border-stone-700 rounded-2xl shadow-2xl p-6 animate-slide-up text-center mx-4">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-bold text-stone-900 dark:text-white">Table {qrTable.number} QR Code</h3>
               <button onClick={() => setQrTable(null)} className="p-1.5 rounded-lg text-stone-400 hover:text-stone-600 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors">
@@ -272,7 +297,7 @@ export default function Tables() {
             <p className="text-xs text-stone-400 mb-4">Scan to view table {qrTable.number} details</p>
             <div className="bg-white rounded-xl p-4 flex items-center justify-center">
               {qrLoading ? (
-                <div className="py-8"><Spinner /></div>
+                <div className="py-8"><Skeleton className="h-8 w-8 rounded-full mx-auto" /></div>
               ) : qrImage ? (
                 <img src={qrImage} alt={`Table ${qrTable.number} QR`} className="w-full max-w-[240px] h-auto" />
               ) : (

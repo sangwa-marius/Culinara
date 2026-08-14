@@ -7,6 +7,7 @@ import {
   LayoutDashboard, Inbox, Truck, ClipboardList,
   Bell, User, Home, Sun, Moon, LogOut, ChevronDown, Menu,
 } from "lucide-react";
+import SafeAvatar from "./SafeImage";
 import clsx from "clsx";
 
 const NAV = [
@@ -89,7 +90,7 @@ export default function DriverLayout() {
             className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-stone-500 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-100 hover:bg-cream-200 dark:hover:bg-stone-800 transition-all duration-150">
             <Icon size={16} className="shrink-0" />{label}
             {badge && unreadCount > 0 && (
-              <span className="ml-auto bg-red-500 text-white text-[9px] px-1.5 py-0.5 rounded-full font-bold">{unreadCount}</span>
+              <span className="ml-auto w-3.5 h-3.5 rounded-full flex items-center justify-center text-[8px] font-bold bg-red-500 text-white">{unreadCount > 9 ? "9+" : unreadCount}</span>
             )}
           </Link>
         ))}
@@ -98,8 +99,8 @@ export default function DriverLayout() {
       <div className="px-3 py-3 border-t border-cream-300 dark:border-stone-800" ref={menuRef}>
         <button onClick={() => setMenuOpen(!menuOpen)}
           className="w-full flex items-center gap-2.5 px-2 py-1.5 rounded-lg hover:bg-cream-200 dark:hover:bg-stone-800 transition-colors">
-          <div className="w-7 h-7 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white font-bold text-xs shrink-0">
-            {user?.name?.charAt(0).toUpperCase()}
+          <div className="w-7 h-7 rounded-full overflow-hidden shrink-0">
+            <SafeAvatar src={user?.avatar} name={user?.name} size="w-7 h-7" textSize="text-xs" />
           </div>
           <div className="flex-1 min-w-0 text-left">
             <p className="text-xs font-semibold text-stone-800 dark:text-white truncate">{user?.name}</p>
@@ -153,10 +154,10 @@ export default function DriverLayout() {
             </button>
             <Link to="/notifications" className="relative p-2 rounded-lg text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 hover:bg-cream-200 dark:hover:bg-stone-800 transition-all">
               <Bell size={16} />
-              {unreadCount > 0 && <span className="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[9px] min-w-[15px] h-[15px] rounded-full flex items-center justify-center font-bold">{unreadCount > 9 ? "9+" : unreadCount}</span>}
+              {unreadCount > 0 && <span className="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[8px] w-3.5 h-3.5 rounded-full flex items-center justify-center font-bold">{unreadCount > 9 ? "9+" : unreadCount}</span>}
             </Link>
-            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white font-bold text-xs ml-1 hidden sm:flex">
-              {user?.name?.charAt(0).toUpperCase()}
+            <div className="w-7 h-7 rounded-full overflow-hidden ml-1 hidden sm:flex">
+              <SafeAvatar src={user?.avatar} name={user?.name} size="w-7 h-7" textSize="text-xs" />
             </div>
           </div>
         </header>

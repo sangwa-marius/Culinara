@@ -6,6 +6,7 @@ import {
   LayoutDashboard, Store, Users, Bell, Settings,
   CreditCard, Sun, Moon, LogOut, ChevronDown, Home, Menu, X,
 } from "lucide-react";
+import SafeAvatar from "./SafeImage";
 import clsx from "clsx";
 
 const NAV = [
@@ -95,8 +96,8 @@ export default function AdminLayout() {
       <div className="px-3 py-3 border-t border-cream-300 dark:border-stone-800" ref={menuRef}>
         <button onClick={() => setMenuOpen(!menuOpen)}
           className="w-full flex items-center gap-2.5 px-2 py-1.5 rounded-lg hover:bg-cream-200 dark:hover:bg-stone-800 transition-colors">
-          <div className="w-7 h-7 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white font-bold text-xs shrink-0">
-            {user?.name?.charAt(0).toUpperCase()}
+          <div className="w-7 h-7 rounded-full overflow-hidden shrink-0">
+            <SafeAvatar src={user?.avatar} name={user?.name} size="w-7 h-7" textSize="text-xs" />
           </div>
           <div className="flex-1 min-w-0 text-left">
             <p className="text-xs font-semibold text-stone-800 dark:text-white truncate">{user?.name}</p>

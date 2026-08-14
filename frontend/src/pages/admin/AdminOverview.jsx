@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Clock } from "lucide-react";
 import { adminAPI } from "../../services/api";
 import OrderStatusBadge from "../../components/OrderStatusBadge";
-import Spinner from "../../components/Spinner";
+import { StatCardSkeleton, CardSkeleton, OrderRowSkeleton } from "../../components/Skeleton";
 import toast from "react-hot-toast";
 import clsx from "clsx";
 
@@ -33,7 +33,19 @@ export default function AdminOverview() {
     );
   }, [stats, now]);
 
-  if (loading) return <div className="flex items-center justify-center py-20"><Spinner /></div>;
+  if (loading) return (
+    <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        {Array.from({ length: 4 }).map((_, i) => <StatCardSkeleton key={i} />)}
+      </div>
+      <div className="card overflow-hidden">
+        <div className="px-4 sm:px-5 py-3 border-b border-cream-300 dark:border-stone-800">
+          <Skeleton className="h-5 w-40" />
+        </div>
+        {Array.from({ length: 4 }).map((_, i) => <OrderRowSkeleton key={i} />)}
+      </div>
+    </div>
+  );
 
   return (
     <div className="p-6 space-y-6">

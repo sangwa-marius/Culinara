@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { TrendingUp, Package, DollarSign, Star, Clock, ArrowRight } from "lucide-react";
-import { restaurantAPI, orderAPI } from "../../services/api";
+import { restaurantAPI, orderAPI, analyticsAPI } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 import { joinRestaurantRoom, getSocket } from "../../utils/socket";
-import Spinner from "../../components/Spinner";
-import toast from "react-hot-toast";
+import { StatCardSkeleton, CardSkeleton, OrderRowSkeleton, Skeleton } from "../../components/Skeleton";
+import SafeAvatar from "../../components/SafeImage";
 import { format } from "date-fns";
 import clsx from "clsx";
 
@@ -14,15 +14,20 @@ export default function RestaurantDashboard() {
   const navigate  = useNavigate();
   const [restaurant, setRestaurant] = useState(null);
   const [orders,     setOrders]     = useState([]);
+  const [analytics, setAnalytics]   = useState(null);
   const [loading,    setLoading]    = useState(true);
 
   useEffect(() => {
     (async () => {
       try {
-        const { data } = await restaurantAPI.getMyRestaurant();
-        if (!data.restaurant) { navigate("/dashboard/setup"); return; }
-        setRestaurant(data.restaurant);
-        const rid = data.restaurant._id;
+        const [{ data: restData }, { data: analyticsData }] = await Promise.all([
+          restaurantAPI.getMyRestaurant(),
+          analyticsAPI.getRestaurant(),
+        ]);
+        if (!restData.restaurant) { navigate("/dashboard/setup"); return; }
+        setRestaurant(restData.restaurant);
+        setAnalytics(analyticsData.analytics || null);
+        const rid = restData.restaurant._id;
         joinRestaurantRoom(rid);
         const socket = getSocket();
         if (socket) socket.on("order_update", () => fetchOrders(rid));
@@ -38,25 +43,52 @@ export default function RestaurantDashboard() {
     } catch (err) { console.error("Failed to fetch orders:", err); }
   };
 
-  if (loading) return <div className="flex items-center justify-center py-20"><Spinner /></div>;
+  if (loading) return (
+    <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+      <div className="space-y-2">
+        <Skeleton className="h-7 w-40" />
+        <Skeleton className="h-4 w-56" />
+      </div>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        {Array.from({ length: 4 }).map((_, i) => <StatCardSkeleton key={i} />)}
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-5">
+        <div className="lg:col-span-2 space-y-3">
+          <Skeleton className="h-5 w-40 mb-4" />
+          {Array.from({ length: 5 }).map((_, i) => <OrderRowSkeleton key={i} />)}
+        </div>
+        <div className="card p-4 sm:p-5 space-y-3">
+          <Skeleton className="h-5 w-32 mb-4" />
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="flex items-center gap-3">
+              <Skeleton className="w-2.5 h-2.5 rounded-full shrink-0" />
+              <Skeleton className="h-4 flex-1" />
+              <Skeleton className="h-4 w-8" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 
   const paidOrders = orders.filter(o => o.paymentStatus === "paid");
-  const revenue = paidOrders.reduce((s, o) => s + o.total, 0);
-  const avgOrder = paidOrders.length ? revenue / paidOrders.length : 0;
+  const avgOrder = paidOrders.length ? paidOrders.reduce((s, o) => s + o.total, 0) / paidOrders.length : 0;
   const pending = orders.filter(o => ["pending","confirmed","preparing"].includes(o.status)).length;
   const recentOrders = orders.slice(0, 8);
+
+  const totalRevenue = analytics?.totalRevenue ?? paidOrders.reduce((s, o) => s + o.total, 0);
 
   return (
     <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
       <div>
         <h1 className="text-xl sm:text-2xl font-bold text-stone-900 dark:text-white">Dashboard</h1>
-        <p className="text-xs sm:text-sm text-stone-400 mt-0.5">Welcome back! Here's what's happening today.</p>
+        <p className="text-xs sm:text-sm text-stone-400 mt-0.5">Welcome back! Here&apos;s what&apos;s happening today.</p>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {[
-          { label: "Today's Revenue", value: `$${revenue.toFixed(2)}`, icon: DollarSign, color: "text-green-600 bg-green-50 dark:bg-green-950/30" },
-          { label: "Total Orders", value: orders.length, icon: Package, color: "text-blue-600 bg-blue-50 dark:bg-blue-950/30" },
+          { label: "Total Revenue", value: `$${totalRevenue.toFixed(2)}`, icon: DollarSign, color: "text-green-600 bg-green-50 dark:bg-green-950/30" },
+          { label: "Total Orders", value: analytics?.totalOrders ?? orders.length, icon: Package, color: "text-blue-600 bg-blue-50 dark:bg-blue-950/30" },
           { label: "Avg Order Value", value: `$${avgOrder.toFixed(2)}`, icon: TrendingUp, color: "text-purple-600 bg-purple-50 dark:bg-purple-950/30" },
           { label: "Active Orders", value: pending, icon: Clock, color: "text-amber-600 bg-amber-50 dark:bg-amber-950/30" },
         ].map(stat => (
@@ -92,8 +124,8 @@ export default function RestaurantDashboard() {
             ) : recentOrders.map(order => (
               <div key={order._id} className="px-4 sm:px-5 py-3 sm:py-3.5 flex items-center justify-between hover:bg-cream-50 dark:hover:bg-stone-800/40 transition-colors">
                 <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-                  <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-cream-200 dark:bg-stone-800 flex items-center justify-center text-xs sm:text-sm font-bold text-stone-600 dark:text-stone-300 shrink-0">
-                    {order.customer?.name?.charAt(0) || "?"}
+                  <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-full overflow-hidden shrink-0">
+                    <SafeAvatar src={order.customer?.avatar} name={order.customer?.name} size="w-7 h-7 sm:w-9 sm:h-9" textSize="text-xs sm:text-sm" />
                   </div>
                   <div className="min-w-0">
                     <p className="text-xs sm:text-sm font-semibold text-stone-900 dark:text-white truncate">#{order.orderNumber}</p>

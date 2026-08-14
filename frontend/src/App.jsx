@@ -1,8 +1,8 @@
-import { lazy, Suspense } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { lazy, Suspense, useEffect } from "react";
+import { BrowserRouter, Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { GoogleOAuthProvider } from "@react-oauth/google";
-import { AuthProvider }         from "./context/AuthContext";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 import { CartProvider }         from "./context/CartContext";
 import { ThemeProvider }        from "./context/ThemeContext";
 import { NotificationProvider } from "./context/NotificationContext";
@@ -13,7 +13,7 @@ import DriverLayout      from "./components/DriverLayout";
 import CustomerLayout    from "./components/CustomerLayout";
 import AdminLayout       from "./components/AdminLayout";
 import ProtectedRoute    from "./components/ProtectedRoute";
-import Spinner           from "./components/Spinner";
+import { Skeleton } from "./components/Skeleton";
 
 // ── Eagerly loaded ────────────────────────────────────────────────────────────
 import Home        from "./pages/Home";
@@ -37,6 +37,7 @@ const MyOrders         = lazy(() => import("./pages/MyOrders"));
 const OrderTracking    = lazy(() => import("./pages/OrderTracking"));
 const Notifications    = lazy(() => import("./pages/Notifications"));
 const Profile          = lazy(() => import("./pages/Profile"));
+const CustomerDashboard = lazy(() => import("./pages/dashboard/CustomerDashboard"));
 
 // ── Owner portal (nested under RestaurantLayout) ──────────────────────────────
 const RestaurantDashboard = lazy(() => import("./pages/dashboard/RestaurantDashboard"));
@@ -58,10 +59,37 @@ const AdminUsers          = lazy(() => import("./pages/admin/AdminUsers"));
 const AdminNotifications  = lazy(() => import("./pages/admin/AdminNotifications"));
 
 // ── Loaders & wrappers ────────────────────────────────────────────────────────
+function RoleRedirect() {
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    if (loading) return;
+    if (!user) return;
+    if (location.pathname !== "/") return;
+
+    if (user.role === "restaurant_owner") navigate("/dashboard", { replace: true });
+    else if (user.role === "delivery_driver") navigate("/driver", { replace: true });
+    else if (user.role === "admin") navigate("/admin", { replace: true });
+    else navigate("/restaurants", { replace: true });
+  }, [user, loading, navigate, location.pathname]);
+
+  if (loading) return <PageLoader />;
+  if (user) return null;
+  return <Home />;
+}
+
 function PageLoader() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-cream-200 dark:bg-stone-950">
-      <Spinner size="lg" />
+      <div className="w-64 space-y-3">
+        <Skeleton className="h-48 w-full rounded-2xl" />
+        <div className="space-y-2">
+          <Skeleton className="h-4 w-3/4" />
+          <Skeleton className="h-3 w-1/2" />
+        </div>
+      </div>
     </div>
   );
 }
@@ -99,7 +127,7 @@ function DriverPortal() {
 
 function CustomerPortal() {
   return (
-    <ProtectedRoute>
+    <ProtectedRoute roles={["customer"]}>
       <CustomerLayout />     {/* contains <Outlet /> */}
     </ProtectedRoute>
   );
@@ -133,9 +161,7 @@ export default function App() {
             <Routes>
 
               {/* ── Public ── */}
-              <Route path="/"                element={<PublicLayout><Home /></PublicLayout>} />
-              <Route path="/restaurants"     element={<PublicLayout><Restaurants /></PublicLayout>} />
-              <Route path="/restaurants/:id" element={<PublicLayout><RestaurantDetail /></PublicLayout>} />
+              <Route path="/" element={<PublicLayout><RoleRedirect /></PublicLayout>} />
               <Route path="/t/:restaurantId/:tableNumber" element={<PublicLayout><TablePublic /></PublicLayout>} />
               <Route path="/subscriptions"   element={<PublicLayout><Subscriptions /></PublicLayout>} />
               <Route path="/login"           element={<PublicLayout noFooter><Login /></PublicLayout>} />
@@ -144,18 +170,6 @@ export default function App() {
               <Route path="/reset-password/:token" element={<PublicLayout><ResetPassword /></PublicLayout>} />
               <Route path="/terms"           element={<PublicLayout><TermsOfService /></PublicLayout>} />
               <Route path="/privacy"         element={<PublicLayout><PrivacyPolicy /></PublicLayout>} />
-
-              {/* ── Shopping (public layout — no sidebar) ── */}
-              <Route path="/cart"     element={<PublicLayout><ProtectedRoute><Cart /></ProtectedRoute></PublicLayout>} />
-              <Route path="/checkout" element={<PublicLayout><ProtectedRoute><Checkout /></ProtectedRoute></PublicLayout>} />
-
-              {/* ── Customer portal — ONE parent route keeps CustomerLayout mounted ── */}
-              <Route element={<CustomerPortal />}>
-                <Route path="/orders"         element={<MyOrders />} />
-                <Route path="/orders/:id"     element={<OrderTracking />} />
-                <Route path="/notifications"  element={<Notifications />} />
-                <Route path="/profile"        element={<Profile />} />
-              </Route>
 
               {/* ── Restaurant owner — ONE parent route keeps RestaurantLayout mounted ── */}
               <Route path="/dashboard" element={<OwnerLayout />}>
@@ -169,6 +183,19 @@ export default function App() {
                 <Route path="profile"     element={<Profile />} />
                 <Route path="notifications" element={<Notifications />} />
                 <Route path="setup"       element={<RestaurantSetup />} />
+              </Route>
+
+              {/* ── Customer portal — ONE parent route keeps CustomerLayout mounted ── */}
+              <Route element={<CustomerPortal />}>
+                <Route path="overview"      element={<CustomerDashboard />} />
+                <Route path="restaurants"    element={<Restaurants />} />
+                <Route path="restaurants/:id" element={<RestaurantDetail />} />
+                <Route path="cart"           element={<Cart />} />
+                <Route path="checkout"       element={<Checkout />} />
+                <Route path="orders"         element={<MyOrders />} />
+                <Route path="orders/:id"     element={<OrderTracking />} />
+                <Route path="notifications"  element={<Notifications />} />
+                <Route path="profile"        element={<Profile />} />
               </Route>
 
               {/* ── Driver portal — ONE parent route keeps DriverLayout mounted ── */}

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Search, SlidersHorizontal, X, ChevronLeft, ChevronRight } from "lucide-react";
 import RestaurantCard from "../components/RestaurantCard";
-import Spinner from "../components/Spinner";
+import { RestaurantCardSkeleton, Skeleton } from "../components/Skeleton";
 import { restaurantAPI } from "../services/api";
 
 const CUISINES = ["Italian","Japanese","Mexican","Vegan","Steakhouse","Bakery","Chinese","Indian","Burgers","Asian","Healthy","Sushi"];
@@ -67,7 +67,10 @@ export default function Restaurants() {
             className={`btn-secondary flex items-center gap-2 px-4 text-sm ${hasFilters ? "border-primary-400 text-primary-600 dark:border-primary-700" : ""}`}>
             <SlidersHorizontal size={15} />
             <span className="hidden sm:inline">Filters</span>
-            {hasFilters && <span className="bg-primary-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">{cuisines.length + (openOnly ? 1 : 0) + (sort !== "rating" ? 1 : 0) + (search ? 1 : 0)}</span>}
+            {hasFilters && (() => {
+              const filterCount = cuisines.length + (openOnly ? 1 : 0) + (sort !== "rating" ? 1 : 0) + (search ? 1 : 0);
+              return <span className="bg-primary-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">{filterCount > 9 ? "9+" : filterCount}</span>;
+            })}
           </button>
         </form>
 
@@ -110,10 +113,13 @@ export default function Restaurants() {
         )}
 
         {/* Grid */}
-        {loading ? <div className="py-24"><Spinner center /></div>
-         : restaurants.length === 0 ? (
+        {loading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pb-8">
+            {Array.from({ length: 8 }).map((_, i) => <RestaurantCardSkeleton key={i} />)}
+          </div>
+        ) : restaurants.length === 0 ? (
           <div className="text-center py-28">
-            <p className="text-5xl mb-4">🔍</p>
+            <Search size={40} className="mx-auto text-stone-300 dark:text-stone-600 mb-4" />
             <h3 className="font-display text-xl font-bold text-stone-900 dark:text-white mb-2">No restaurants found</h3>
             <p className="text-stone-400 text-sm mb-5">Try adjusting your search or filters</p>
             <button onClick={clear} className="btn-primary">Clear filters</button>
