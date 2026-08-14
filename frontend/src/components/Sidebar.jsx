@@ -1,5 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import SafeAvatar from "./SafeImage";
 import clsx from "clsx";
 
 /**
@@ -43,7 +44,7 @@ export default function Sidebar({ items, bottomItems, title, subtitle }) {
             {renderIcon(item.icon)}
             <span>{item.label}</span>
             {item.badge > 0 && (
-              <span className="ml-auto bg-white/25 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">{item.badge}</span>
+              <span className="ml-auto bg-white/25 text-white text-[8px] w-3.5 h-3.5 rounded-full flex items-center justify-center font-bold">{item.badge > 9 ? "9+" : item.badge}</span>
             )}
           </Link>
         ))}
@@ -65,8 +66,8 @@ export default function Sidebar({ items, bottomItems, title, subtitle }) {
       {/* User footer */}
       <div className="px-3 py-3 border-t border-cream-300 dark:border-stone-800">
         <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white font-bold text-xs shrink-0">
-            {user?.name?.charAt(0).toUpperCase()}
+          <div className="w-7 h-7 rounded-full overflow-hidden shrink-0">
+            <SafeAvatar src={user?.avatar} name={user?.name} size="w-7 h-7" textSize="text-xs" />
           </div>
           <div className="min-w-0">
             <p className="text-xs font-semibold text-stone-800 dark:text-white truncate">{user?.name}</p>
