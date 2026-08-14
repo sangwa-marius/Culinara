@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Search, CheckCircle, XCircle, Store, RefreshCw } from "lucide-react";
 import { restaurantAPI } from "../../services/api";
 import ConfirmDialog from "../../components/ConfirmDialog";
-import Spinner from "../../components/Spinner";
+import { RestaurantCardSkeleton, StatCardSkeleton, Skeleton } from "../../components/Skeleton";
 import toast from "react-hot-toast";
 
 export default function AdminRestaurants() {
@@ -57,7 +57,20 @@ export default function AdminRestaurants() {
   const pending  = restaurants.filter(r => !r.isApproved).length;
   const approved = restaurants.filter(r => r.isApproved).length;
 
-  if (loading) return <div className="flex items-center justify-center py-20"><Spinner /></div>;
+  if (loading) return (
+    <div className="p-4 sm:p-6 space-y-4 sm:space-y-5">
+      <div className="space-y-2">
+        <Skeleton className="h-7 w-52" />
+        <Skeleton className="h-4 w-40" />
+      </div>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {Array.from({ length: 4 }).map((_, i) => <StatCardSkeleton key={i} />)}
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {Array.from({ length: 6 }).map((_, i) => <RestaurantCardSkeleton key={i} />)}
+      </div>
+    </div>
+  );
 
   return (
     <div className="p-6 space-y-5">
