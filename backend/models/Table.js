@@ -11,7 +11,7 @@ const tableSchema = new mongoose.Schema({
   isActive:   { type: Boolean, default: true },
 }, { timestamps: true });
 
-tableSchema.index({ restaurant: 1, number: 1 }, { unique: true });
+tableSchema.index({ restaurant: 1, number: 1 }, { unique: true, partialFilterExpression: { isActive: true } });
 tableSchema.index({ restaurant: 1, status: 1 });
 
 module.exports = mongoose.model("Table", tableSchema);
