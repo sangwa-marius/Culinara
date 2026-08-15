@@ -17,9 +17,9 @@ const NAV = [
   { to: "/driver/history",   label: "History",          icon: ClipboardList },
 ];
 const BOTTOM = [
-  { to: "/driver/notifications", label: "Notifications", icon: Bell,   badge: true },
-  { to: "/driver/profile",       label: "Profile",        icon: User },
-  { to: "/",                     label: "Back to App",    icon: Home },
+  { to: "/notifications", label: "Notifications", icon: Bell,   badge: true },
+  { to: "/profile",       label: "Profile",        icon: User },
+  { to: "/",              label: "Back to App",    icon: Home },
 ];
 
 export default function DriverLayout() {
@@ -77,7 +77,7 @@ export default function DriverLayout() {
           <Link key={to} to={to} onClick={() => setSidebarOpen(false)}
             className={clsx("flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 border-l-2",
               isActive({ to, exact })
-                ? "bg-primary-500 dark:bg-primary-500 border-primary-500 text-white dark:text-whitie"
+                ? "bg-primary-500 dark:bg-primary-500 border-primary-500 text-white dark:text-white"
                 : "border-transparent text-stone-500 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-100 hover:bg-cream-200 dark:hover:bg-stone-800")}>
             <Icon size={16} className="shrink-0" />{label}
           </Link>
@@ -110,7 +110,7 @@ export default function DriverLayout() {
         </button>
         {menuOpen && (
           <div className="mt-1 bg-white dark:bg-stone-900 border border-cream-300 dark:border-stone-700 rounded-xl shadow-lg overflow-hidden animate-slide-up">
-            <Link to="/profile" className="flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-stone-600 dark:text-stone-300 hover:bg-cream-100 dark:hover:bg-stone-800 transition-colors">
+            <Link to="/driver/profile" className="flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-stone-600 dark:text-stone-300 hover:bg-cream-100 dark:hover:bg-stone-800 transition-colors">
               <User size={13} className="text-stone-400" /> Profile
             </Link>
             <div className="border-t border-cream-200 dark:border-stone-700" />
@@ -152,7 +152,7 @@ export default function DriverLayout() {
             <button onClick={toggleTheme} className="p-2 rounded-lg text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 hover:bg-cream-200 dark:hover:bg-stone-800 transition-all">
               {theme === "dark" ? <Sun size={16} className="text-amber-400" /> : <Moon size={16} />}
             </button>
-            <Link to="/notifications" className="relative p-2 rounded-lg text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 hover:bg-cream-200 dark:hover:bg-stone-800 transition-all">
+            <Link to="/driver/notifications" className="relative p-2 rounded-lg text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 hover:bg-cream-200 dark:hover:bg-stone-800 transition-all">
               <Bell size={16} />
               {unreadCount > 0 && <span className="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[8px] w-3.5 h-3.5 rounded-full flex items-center justify-center font-bold">{unreadCount > 9 ? "9+" : unreadCount}</span>}
             </Link>
