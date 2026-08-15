@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { MapPin, Phone, Package, CheckCircle, Trash2, X,
          Navigation, Star, TrendingUp, DollarSign, Clock,
-         Bike, AlertCircle } from "lucide-react";
+         Bike, AlertCircle, Calendar } from "lucide-react";
 import { driverAPI, orderAPI } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 import { getSocket } from "../../utils/socket";
@@ -20,7 +20,7 @@ export default function DriverDashboard() {
   const [history,      setHistory]    = useState([]);
   const [loading,      setLoading]    = useState(true);
   const [isOnline,     setIsOnline]   = useState(true);
-  const [stats,        setStats]      = useState({ deliveries: 0, earnings: 0, rating: 0 });
+  const [stats,        setStats]      = useState({ totalDeliveries: 0, todayDeliveries: 0, totalEarnings: 0, todayEarnings: 0, rating: 0 });
   // delivery request popup — holds the full order object
   const [requestOrder, setRequestOrder] = useState(null);
   const [requestLoading,setRequestLoading] = useState(false);
@@ -82,7 +82,7 @@ export default function DriverDashboard() {
       setAvailable(avail.data.orders || []);
       setDeliveries(myDel.data.orders || []);
       setHistory(hist.data.orders || []);
-      setStats(st.data.stats || { deliveries: 0, earnings: 0, rating: 0 });
+      setStats(st.data.stats || { totalDeliveries: 0, todayDeliveries: 0, totalEarnings: 0, todayEarnings: 0, rating: 0 });
     } catch { toast.error("Failed to load data"); }
     finally { setLoading(false); }
   };
@@ -144,7 +144,28 @@ export default function DriverDashboard() {
   );
 
   return (
-    <div className="p-6 space-y-5">
+    <div className="p-4 sm:p-6 space-y-4 sm:space-y-5">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h1 className="text-xl sm:text-2xl font-bold text-stone-900 dark:text-white">
+            {user?.name ? `Welcome, ${user.name.split(" ")[0]}` : "Driver Dashboard"}
+          </h1>
+          <p className="text-xs sm:text-sm text-stone-400 mt-0.5 flex items-center gap-1.5">
+            <Calendar size={12} className="hidden sm:block" />
+            {format(new Date(), "EEEE, MMMM d, yyyy")}
+          </p>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 bg-white dark:bg-stone-900 border border-cream-300 dark:border-stone-700 rounded-full px-3 py-1.5">
+            <span className={clsx("w-2 h-2 rounded-full", isOnline ? "bg-green-500 animate-pulse" : "bg-stone-300")} />
+            <span className="text-xs font-medium text-stone-600 dark:text-stone-300">{isOnline ? "Online" : "Offline"}</span>
+            <button onClick={() => setIsOnline(!isOnline)} className={clsx("relative w-8 h-5 rounded-full transition-colors", isOnline ? "bg-green-500" : "bg-stone-300")}>
+              <span className={clsx("absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform", isOnline ? "translate-x-3" : "translate-x-0")} />
+            </button>
+          </div>
+        </div>
+      </div>
 
       {/* Offline banner */}
       {!isOnline && (
@@ -161,18 +182,21 @@ export default function DriverDashboard() {
       )}
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {[
-          { label: "Deliveries",   value: stats.deliveries,                    icon: Bike },
-          { label: "Earnings",     value: `$${(stats.earnings || 0).toFixed(2)}`, icon: DollarSign },
-          { label: "Rating",       value: stats.rating ? `${stats.rating} ★` : "N/A", icon: Star },
+          { label: "Total Deliveries", value: stats.totalDeliveries,          icon: Bike,        color: "text-primary-600 bg-primary-50 dark:bg-primary-950/30" },
+          { label: "Today",            value: stats.todayDeliveries,           icon: TrendingUp,  color: "text-green-600 bg-green-50 dark:bg-green-950/30" },
+          { label: "Total Earnings",   value: `$${(stats.totalEarnings || 0).toFixed(2)}`, icon: DollarSign, color: "text-amber-600 bg-amber-50 dark:bg-amber-950/30" },
+          { label: "Today's Earnings", value: `$${(stats.todayEarnings || 0).toFixed(2)}`,  icon: DollarSign, color: "text-emerald-600 bg-emerald-50 dark:bg-emerald-950/30" },
         ].map(s => (
-          <div key={s.label} className="card p-4 text-center">
-            <div className="w-9 h-9 bg-cream-200 dark:bg-stone-800 rounded-xl flex items-center justify-center mx-auto mb-2">
-              <s.icon size={17} className="text-stone-500 dark:text-stone-400" />
+          <div key={s.label} className="card p-3.5 sm:p-4 flex items-center gap-2.5 sm:gap-3">
+            <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shrink-0 ${s.color}`}>
+              <s.icon size={17} className="sm:w-5 sm:h-5" />
             </div>
-            <p className="font-bold text-stone-900 dark:text-white text-xl">{s.value}</p>
-            <p className="text-xs text-stone-400 mt-0.5">{s.label}</p>
+            <div className="min-w-0">
+              <p className="text-[10px] sm:text-xs text-stone-400 font-medium">{s.label}</p>
+              <p className="font-bold text-stone-900 dark:text-white text-base sm:text-lg mt-0.5 leading-tight">{s.value}</p>
+            </div>
           </div>
         ))}
       </div>
@@ -182,17 +206,22 @@ export default function DriverDashboard() {
         <div className="border-b border-cream-300 dark:border-stone-800 flex">
           {TABS.map(t => (
             <button key={t.key} onClick={() => setTab(t.key)}
-              className={clsx("flex-1 px-4 py-3 text-sm font-semibold transition-all border-b-2",
+              className={clsx("flex-1 px-4 py-3.5 text-sm font-semibold transition-all duration-200 relative",
                 tab === t.key
-                  ? "border-primary-500 text-primary-600 dark:text-primary-400"
-                  : "border-transparent text-stone-400 hover:text-stone-700 dark:hover:text-stone-200")}>
-              {t.label}
-              {t.count > 0 && (
-                <span className={clsx("ml-2 w-3.5 h-3.5 rounded-full flex items-center justify-center text-[8px] font-bold",
-                  tab === t.key ? "bg-primary-500 text-white" : "bg-stone-100 dark:bg-stone-800 text-stone-500")}>
-                  {t.count > 9 ? "9+" : t.count}
-                </span>
+                  ? "text-primary-600 dark:text-primary-400"
+                  : "text-stone-400 hover:text-stone-700 dark:hover:text-stone-200")}>
+              {tab === t.key && (
+                <span className="absolute inset-x-3 bottom-0 h-[3px] bg-primary-500 rounded-full" />
               )}
+              <span className="flex items-center justify-center gap-2">
+                {t.label}
+                {t.count > 0 && (
+                  <span className={clsx("px-2 py-0.5 rounded-full text-[10px] font-bold min-w-[1.25rem]",
+                    tab === t.key ? "bg-primary-500 text-white" : "bg-cream-200 dark:bg-stone-800 text-stone-500")}>
+                    {t.count > 99 ? "99+" : t.count}
+                  </span>
+                )}
+              </span>
             </button>
           ))}
         </div>
@@ -253,109 +282,111 @@ export default function DriverDashboard() {
           <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setRequestOrder(null)} />
           <div className="relative w-full max-w-md bg-white dark:bg-stone-900 border border-cream-300 dark:border-stone-700 rounded-2xl shadow-2xl animate-slide-up overflow-hidden mx-4">
 
-            {/* Header */}
-            <div className="bg-primary-500 px-5 py-4 flex items-center justify-between">
-              <div className="flex items-center gap-2.5 text-white">
-                <Package size={18} />
-                <span className="font-bold">New Delivery Request</span>
-              </div>
-              <button onClick={() => setRequestOrder(null)}
-                className="p-1.5 rounded-lg bg-white/15 hover:bg-white/25 text-white transition-colors">
-                <X size={16} />
-              </button>
-            </div>
+             {/* Header */}
+             <div className="bg-primary-500 px-5 py-4 flex items-center justify-between">
+               <div className="flex items-center gap-2.5 text-white">
+                 <Package size={18} />
+                 <span className="font-bold">New Delivery Request</span>
+               </div>
+               <button onClick={() => setRequestOrder(null)}
+                 className="p-1.5 rounded-lg bg-white/15 hover:bg-white/25 text-white transition-colors">
+                 <X size={16} />
+               </button>
+             </div>
 
-            {requestOrder._loading ? (
-              <div className="p-10 flex flex-col items-center gap-3">
-                <Skeleton className="w-8 h-8 rounded-full" />
-                <Skeleton className="h-4 w-40" />
-              </div>
-            ) : (
-              <div className="p-5 space-y-4">
-                {/* Order number + value */}
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="font-bold text-stone-900 dark:text-white">#{requestOrder.orderNumber}</p>
-                    <p className="text-xs text-stone-400 mt-0.5">{requestOrder.items?.length || 0} items</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-black text-2xl text-primary-500">${requestOrder.total?.toFixed(2)}</p>
-                    <p className="text-xs text-stone-400">Order total</p>
-                  </div>
-                </div>
+             {requestOrder._loading ? (
+               <div className="p-10 flex flex-col items-center gap-3">
+                 <Skeleton className="w-8 h-8 rounded-full" />
+                 <Skeleton className="h-4 w-40" />
+               </div>
+             ) : (
+               <div className="p-5 space-y-4">
+                 {/* Order number + value */}
+                 <div className="flex items-start justify-between">
+                   <div>
+                     <p className="font-bold text-stone-900 dark:text-white text-lg">#{requestOrder.orderNumber}</p>
+                     <p className="text-xs text-stone-400 mt-0.5">{requestOrder.items?.length || 0} items</p>
+                   </div>
+                   <div className="text-right">
+                     <p className="font-black text-2xl text-primary-500">${requestOrder.total?.toFixed(2)}</p>
+                     {requestOrder.deliveryFee && (
+                       <p className="text-xs text-green-600 dark:text-green-400 font-medium">+${requestOrder.deliveryFee.toFixed(2)} delivery fee</p>
+                     )}
+                   </div>
+                 </div>
 
-                {/* Route */}
-                <div className="bg-cream-100 dark:bg-stone-800 rounded-xl p-4 space-y-3">
-                  {/* Pick up */}
-                  <div className="flex gap-3">
-                    <div className="flex flex-col items-center gap-1 pt-1 shrink-0">
-                      <div className="w-2.5 h-2.5 rounded-full bg-primary-500" />
-                      <div className="w-px flex-1 bg-cream-400 dark:bg-stone-600 min-h-[20px]" />
-                      <div className="w-2.5 h-2.5 rounded-full bg-green-500" />
-                    </div>
-                    <div className="flex-1 space-y-3">
-                      <div>
-                        <p className="text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-0.5">Pick Up</p>
-                        <p className="font-semibold text-stone-900 dark:text-white text-sm">{requestOrder.restaurant?.name || "Restaurant"}</p>
-                        {requestOrder.restaurant?.address && (
-                          <p className="text-xs text-stone-500">{requestOrder.restaurant.address.street}, {requestOrder.restaurant.address.city}</p>
-                        )}
-                        {requestOrder.restaurant?.phone && (
-                          <a href={`tel:${requestOrder.restaurant.phone}`}
-                            className="text-xs text-primary-500 hover:text-primary-600 flex items-center gap-1 mt-0.5">
-                            <Phone size={10} />{requestOrder.restaurant.phone}
-                          </a>
-                        )}
-                      </div>
-                      <div>
-                        <p className="text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-0.5">Drop Off</p>
-                        {requestOrder.deliveryAddress ? (
-                          <p className="font-semibold text-stone-900 dark:text-white text-sm">
-                            {[requestOrder.deliveryAddress.street, requestOrder.deliveryAddress.city].filter(Boolean).join(", ")}
-                          </p>
-                        ) : (
-                          <p className="text-sm text-stone-400 italic">Address on file</p>
-                        )}
-                        {requestOrder.customer?.phone && (
-                          <a href={`tel:${requestOrder.customer.phone}`}
-                            className="text-xs text-primary-500 hover:text-primary-600 flex items-center gap-1 mt-0.5">
-                            <Phone size={10} />{requestOrder.customer.phone}
-                          </a>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                 {/* Route */}
+                 <div className="bg-cream-100 dark:bg-stone-800 rounded-xl p-4 space-y-3">
+                   {/* Pick up */}
+                   <div className="flex gap-3">
+                     <div className="flex flex-col items-center gap-1 pt-1.5 shrink-0">
+                       <div className="w-3 h-3 rounded-full bg-primary-500 ring-4 ring-primary-100 dark:ring-primary-900/30" />
+                       <div className="w-0.5 flex-1 bg-cream-400 dark:bg-stone-600 min-h-[20px]" />
+                       <div className="w-3 h-3 rounded-full bg-green-500 ring-4 ring-green-100 dark:ring-green-900/30" />
+                     </div>
+                     <div className="flex-1 space-y-3">
+                       <div>
+                         <p className="text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-0.5">Pick Up</p>
+                         <p className="font-semibold text-stone-900 dark:text-white text-sm">{requestOrder.restaurant?.name || "Restaurant"}</p>
+                         {requestOrder.restaurant?.address && (
+                           <p className="text-xs text-stone-500">{requestOrder.restaurant.address.street}, {requestOrder.restaurant.address.city}</p>
+                         )}
+                         {requestOrder.restaurant?.phone && (
+                           <a href={`tel:${requestOrder.restaurant.phone}`}
+                             className="text-xs text-primary-500 hover:text-primary-600 flex items-center gap-1 mt-0.5">
+                             <Phone size={10} />{requestOrder.restaurant.phone}
+                           </a>
+                         )}
+                       </div>
+                       <div>
+                         <p className="text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-0.5">Drop Off</p>
+                         {requestOrder.deliveryAddress ? (
+                           <p className="font-semibold text-stone-900 dark:text-white text-sm">
+                             {[requestOrder.deliveryAddress.street, requestOrder.deliveryAddress.city].filter(Boolean).join(", ")}
+                           </p>
+                         ) : (
+                           <p className="text-sm text-stone-400 italic">Address on file</p>
+                         )}
+                         {requestOrder.customer?.phone && (
+                           <a href={`tel:${requestOrder.customer.phone}`}
+                             className="text-xs text-primary-500 hover:text-primary-600 flex items-center gap-1 mt-0.5">
+                             <Phone size={10} />{requestOrder.customer.phone}
+                           </a>
+                         )}
+                       </div>
+                     </div>
+                   </div>
+                 </div>
 
-                {/* Items summary */}
-                {requestOrder.items?.length > 0 && (
-                  <div>
-                    <p className="text-xs font-bold text-stone-500 uppercase tracking-wider mb-2">Items</p>
-                    <div className="space-y-1">
-                      {requestOrder.items.slice(0, 4).map((item, i) => (
-                        <div key={i} className="flex justify-between text-sm">
-                          <span className="text-stone-600 dark:text-stone-300">{item.quantity}× {item.name}</span>
-                          <span className="text-stone-400">${(item.price * item.quantity).toFixed(2)}</span>
-                        </div>
-                      ))}
-                      {requestOrder.items.length > 4 && (
-                        <p className="text-xs text-stone-400 italic">+{requestOrder.items.length - 4} more items</p>
-                      )}
-                    </div>
-                  </div>
-                )}
+                 {/* Items summary */}
+                 {requestOrder.items?.length > 0 && (
+                   <div>
+                     <p className="text-xs font-bold text-stone-500 uppercase tracking-wider mb-2">Items</p>
+                     <div className="space-y-1.5">
+                       {requestOrder.items.slice(0, 4).map((item, i) => (
+                         <div key={i} className="flex justify-between text-sm">
+                           <span className="text-stone-600 dark:text-stone-300">{item.quantity}× {item.name}</span>
+                           <span className="text-stone-500 font-medium">${(item.price * item.quantity).toFixed(2)}</span>
+                         </div>
+                       ))}
+                       {requestOrder.items.length > 4 && (
+                         <p className="text-xs text-stone-400 italic">+{requestOrder.items.length - 4} more items</p>
+                       )}
+                     </div>
+                   </div>
+                 )}
 
-                {/* Actions */}
-                <div className="flex gap-3 pt-1">
-                  <button onClick={() => setRequestOrder(null)} className="btn-secondary flex-1 py-2.5">
-                    Decline
-                  </button>
-                  <button onClick={() => accept(requestOrder._id)} className="btn-primary flex-1 py-2.5 gap-2">
-                    <CheckCircle size={15} /> Accept Delivery
-                  </button>
-                </div>
-              </div>
-            )}
+                 {/* Actions */}
+                 <div className="flex gap-3 pt-1">
+                   <button onClick={() => setRequestOrder(null)} className="btn-secondary flex-1 py-2.5">
+                     Decline
+                   </button>
+                   <button onClick={() => accept(requestOrder._id)} className="btn-primary flex-1 py-2.5 gap-2">
+                     <CheckCircle size={15} /> Accept Delivery
+                   </button>
+                 </div>
+               </div>
+             )}
           </div>
         </div>
       )}
@@ -389,22 +420,35 @@ function EmptyState({ icon: Icon, msg }) {
 }
 
 function OrderCard({ order, expanded, onExpand, action }) {
+  const isAvailable = action && action.type?.toString?.()?.includes?.("Accept") || false;
   return (
-    <div className="px-5 py-4 hover:bg-cream-50 dark:hover:bg-stone-800/40 transition-colors">
-      <div className="flex items-start justify-between gap-4">
+    <div className={clsx("px-4 sm:px-5 py-4 transition-colors",
+      expanded ? "bg-cream-50 dark:bg-stone-800/30" : "hover:bg-cream-50 dark:hover:bg-stone-800/30")}>
+      <div className="flex items-start justify-between gap-3">
         <button onClick={onExpand} className="flex-1 min-w-0 text-left">
-          <div className="flex items-center gap-2 flex-wrap mb-1">
+          <div className="flex items-center gap-2 flex-wrap mb-1.5">
             <span className="font-bold text-stone-900 dark:text-white text-sm">#{order.orderNumber}</span>
             <OrderStatusBadge status={order.status} />
           </div>
-          <p className="text-xs text-stone-400">{order.restaurant?.name}</p>
+          <div className="flex items-center gap-2 flex-wrap">
+            <p className="text-xs text-stone-500 dark:text-stone-400">{order.restaurant?.name}</p>
+            {order.deliveryFee && (
+              <span className="text-[10px] font-semibold text-primary-500 bg-primary-50 dark:bg-primary-950/20 px-1.5 py-0.5 rounded">
+                +${order.deliveryFee.toFixed(2)} fee
+              </span>
+            )}
+          </div>
           {order.createdAt && (
-            <p className="text-xs text-stone-400">{format(new Date(order.createdAt), "MMM d, HH:mm")}</p>
+            <p className="text-[11px] text-stone-400 mt-1 flex items-center gap-1">
+              <Clock size={10} />{format(new Date(order.createdAt), "MMM d, HH:mm")}
+            </p>
           )}
         </button>
         <div className="flex items-center gap-2 shrink-0">
-          <p className="font-bold text-stone-900 dark:text-white text-sm">${order.total?.toFixed(2)}</p>
-          {action}
+          <div className="text-right">
+            <p className="font-bold text-stone-900 dark:text-white text-sm">${order.total?.toFixed(2)}</p>
+            {action && <div className="mt-1.5">{action}</div>}
+          </div>
         </div>
       </div>
 
