@@ -201,7 +201,7 @@ export default function RestaurantOrders() {
             return (
               <button key={tab} onClick={() => setActiveTab(tab)}
                 className={clsx("px-2.5 sm:px-3 py-1.5 rounded-lg text-[10px] sm:text-xs font-semibold whitespace-nowrap transition-all",
-                  activeTab === tab ? "bg-primary-500 text-white" : "text-stone-500 hover:text-stone-800 hover:bg-cream-200 dark:hover:bg-stone-800")}>
+                  activeTab === tab ? "bg-primary-500 text-white" : "text-stone-500 hover:text-stone-800 dark:hover:bg-stone-900 dark:hover:text-stone-300")}>
                 {tab === "all" ? `All (${orders.length})` : tab.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase())}
                 {tab !== "all" && count > 0 && ` (${count})`}
               </button>
