@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useLocation, Link } from "react-router-dom";
 import { MapPin, Phone, Package, CheckCircle, Trash2, X,
          Navigation, Star, TrendingUp, DollarSign, Clock,
          Bike, AlertCircle, Calendar } from "lucide-react";
@@ -14,7 +15,11 @@ import clsx from "clsx";
 
 export default function DriverDashboard() {
   const { user }   = useAuth();
-  const [tab,          setTab]        = useState("available");
+  const location = useLocation();
+  const pathTab = location.pathname.includes("active") ? "active"
+                : location.pathname.includes("history") ? "history"
+                : "available";
+  const [tab,          setTab]        = useState(pathTab);
   const [available,    setAvailable]  = useState([]);
   const [deliveries,   setDeliveries] = useState([]);
   const [history,      setHistory]    = useState([]);
@@ -28,6 +33,13 @@ export default function DriverDashboard() {
   const [deletingId,   setDeletingId]  = useState(null);
   const [deleteLoad,   setDeleteLoad]  = useState(false);
   const [expanded,     setExpanded]    = useState(null);
+
+  useEffect(() => {
+    const next = location.pathname.includes("active") ? "active"
+               : location.pathname.includes("history") ? "history"
+               : "available";
+    setTab(next);
+  }, [location.pathname]);
 
   useEffect(() => {
     fetchAll();
@@ -118,9 +130,9 @@ export default function DriverDashboard() {
   };
 
   const TABS = [
-    { key: "available",  label: "Available",     count: available.length },
-    { key: "active",     label: "My Deliveries", count: deliveries.length },
-    { key: "history",    label: "History",       count: history.length },
+    { key: "available",  label: "Available",     to: "/driver/available", count: available.length },
+    { key: "active",     label: "My Deliveries", to: "/driver/active",    count: deliveries.length },
+    { key: "history",    label: "History",       to: "/driver/history",   count: history.length },
   ];
 
   if (loading) return (
@@ -205,7 +217,7 @@ export default function DriverDashboard() {
       <div className="card overflow-hidden">
         <div className="border-b border-cream-300 dark:border-stone-800 flex">
           {TABS.map(t => (
-            <button key={t.key} onClick={() => setTab(t.key)}
+            <Link key={t.key} to={t.to}
               className={clsx("flex-1 px-4 py-3.5 text-sm font-semibold transition-all duration-200 relative",
                 tab === t.key
                   ? "text-primary-600 dark:text-primary-400"
@@ -222,7 +234,7 @@ export default function DriverDashboard() {
                   </span>
                 )}
               </span>
-            </button>
+            </Link>
           ))}
         </div>
 
