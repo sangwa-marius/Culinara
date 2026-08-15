@@ -92,13 +92,13 @@ export default function Profile() {
           <h2 className="font-semibold text-stone-900 dark:text-white mb-4 flex items-center gap-2"><Lock size={16} className="text-primary-500" /> Change Password</h2>
           <form onSubmit={handlePassword} className="space-y-4">
             {[
-              { key: "current", label: "Current Password" },
-              { key: "new",     label: "New Password" },
-              { key: "confirm", label: "Confirm New Password" },
-            ].map(({ key, label }) => (
+              { key: "current", label: "Current Password",placeholder:"Enter the current password" },
+              { key: "new",     label: "New Password", placeholder: "Enter new password" },
+              { key: "confirm", label: "Confirm New Password", placeholder: "Confirm your new password" },
+            ].map(({ key, label, placeholder }) => (
               <div key={key}>
                 <label className="block text-xs font-semibold text-stone-500 uppercase tracking-wide mb-1.5">{label}</label>
-                <input type="password" value={pwd[key]} onChange={e => setPwd({...pwd, [key]: e.target.value})} className="input-field" />
+                <input type="password" value={pwd[key]} onChange={e => setPwd({...pwd, [key]: e.target.value})} className="input-field"placeholder={placeholder} />
               </div>
             ))}
             <button type="submit" disabled={pwdLoading} className="btn-primary gap-2">

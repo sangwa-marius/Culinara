@@ -110,7 +110,7 @@ export default function NotificationsPage() {
 
   // ── Render ────────────────────────────────────────────────────────────────────
   return (
-    <div className="p-6 max-w-3xl mx-auto">
+    <div className="p-4 max-w-3xl mx-auto">
 
       {/* Confirm Clear All Dialog */}
       {confirmClearAll && (
@@ -168,7 +168,7 @@ export default function NotificationsPage() {
               onClick={fetchNotifications}
               disabled={loading}
               title="Refresh"
-              className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-all disabled:opacity-40"
+              className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-stone-800 rounded-xl transition-all disabled:opacity-40"
             >
               <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
             </button>
@@ -236,7 +236,7 @@ export default function NotificationsPage() {
           </div>
         ) : filtered.length === 0 ? (
           <div className="card p-16 text-center">
-            <div className="mb-4">< Bell size={70} className="m-auto text-stone-500 animate-pulse"/></div>
+            <div className="mb-4">< Bell size={40} className="m-auto text-gray-500 dark:text-stone-500"/></div>
             <h3 className="text-xl font-bold text-gray-500 dark:text-white mb-2">
               {activeFilter === "all" ? "No notifications yet" : `No ${activeFilter} notifications`}
             </h3>
@@ -246,7 +246,7 @@ export default function NotificationsPage() {
                 : (
                   <button
                     onClick={() => setActiveFilter("all")}
-                    className="text-primary-500 dark:text-primary-400 hover:underline"
+                    className=" hover:underline"
                   >
                     Switch to "All" to see everything
                   </button>

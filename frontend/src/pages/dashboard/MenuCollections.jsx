@@ -206,11 +206,11 @@ export default function MenuCollections() {
                   {/* Action buttons overlay */}
                   <div className="absolute top-2.5 right-2.5 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button onClick={() => openEdit(col)}
-                      className="p-1.5 bg-white/90 dark:bg-stone-900/90 rounded-lg text-stone-600 hover:text-primary-500 transition-colors shadow-sm">
+                      className="p-1.5 bg-white/90 dark:bg-stone-900/90 dark:text-white rounded-lg text-stone-600 hover:text-primary-500 transition-colors shadow-sm">
                       <Pencil size={13} />
                     </button>
                     <button onClick={() => setDeleteTarget(col._id)}
-                      className="p-1.5 bg-white/90 dark:bg-stone-900/90 rounded-lg text-stone-600 hover:text-red-500 transition-colors shadow-sm">
+                      className="p-1.5 bg-white/90 dark:bg-stone-900/90 rounded-lg text-stone-600 text-red-500 dark:text-red-500 transition-colors shadow-sm">
                       <Trash2 size={13} />
                     </button>
                   </div>

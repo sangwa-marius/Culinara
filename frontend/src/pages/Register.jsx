@@ -87,7 +87,7 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen pt-20 grid md:grid-cols-5">
+    <div className="min-h-screen mt-8 grid md:grid-cols-5">
       {/* Left form */}
       <div className="flex items-center justify-center px-6 py-12 md:col-span-3">
         <div className="w-full max-w-sm">
@@ -154,7 +154,7 @@ export default function Register() {
                     <div className="relative">
                       <Icon size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" />
                       <input type={type} required={req} value={form[key]} onChange={e => setForm({...form, [key]: e.target.value})}
-                        placeholder={ph} className="input-field pl-10 py-2 text-sm" />
+                        placeholder={ph} className="input-field pl-10 py-3 text-sm bg-transparent dark:bg-transparent" />
                     </div>
                   </div>
                 ))}
@@ -168,7 +168,7 @@ export default function Register() {
                   <div className="relative">
                     <Lock size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" />
                     <input type={show ? "text" : "password"} required value={form.password} onChange={e => setForm({...form, password: e.target.value})}
-                      placeholder="At least 6 characters" className="input-field pl-10 pr-10 py-2 text-sm" autoComplete="new-password" />
+                      placeholder="At least 6 characters" className="input-field pl-10 pr-10 py-3 text-sm bg-transparent dark:bg-transparent" autoComplete="new-password" />
                     <button type="button" onClick={() => setShow(!show)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 transition-colors">
                       {show ? <EyeOff size={14} /> : <Eye size={14} />}
                     </button>
@@ -180,7 +180,7 @@ export default function Register() {
                     <Lock size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" />
                     <input type="password" required value={confirm} onChange={e => setConfirm(e.target.value)}
                       placeholder="Repeat your password"
-                      className={`input-field pl-10 py-2 text-sm ${diff ? "border-red-400" : match ? "border-green-400" : ""}`}
+                      className={`input-field pl-10 py-3 text-sm bg-transparent dark:bg-transparent ${diff ? "border-red-400" : match ? "border-green-400" : ""}`}
                       autoComplete="new-password" />
                   </div>
                   {diff  && <p className="text-[11px] text-red-500 mt-1 flex items-center gap-1"><XCircle size={11} /> Passwords don't match</p>}

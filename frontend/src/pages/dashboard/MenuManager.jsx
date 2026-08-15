@@ -139,7 +139,7 @@ export default function MenuManager() {
   );
 
   return (
-    <div className="min-h-screen bg-cream-100 dark:bg-stone-950 pt-20 px-4 pb-16">
+    <div className="min-h-screen bg-cream-100 dark:bg-stone-950 p-4 pb-16">
       <div className="max-w-5xl mx-auto py-6 space-y-5">
         <div className="flex justify-between items-center">
           <div>
@@ -254,18 +254,21 @@ export default function MenuManager() {
 
       {/* Add / Edit Modal */}
       {modalOpen && (
-        <div className="fixed inset-0 z-[150] flex items-center justify-center">
-          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={closeModal} />
-           <div className="relative w-full max-w-2xl bg-white dark:bg-stone-900 border border-cream-300 dark:border-stone-700 rounded-2xl shadow-2xl p-6 animate-slide-up max-h-[90vh] overflow-y-auto mx-4">
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="text-xl font-bold text-stone-900 dark:text-white">
-                {editingItem ? "Edit Menu Item" : "Add New Menu Item"}
-              </h2>
-              <button onClick={closeModal} className="p-1.5 rounded-lg text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors">
-                <X size={18} />
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setModalOpen(false)} />
+          <div className="relative w-full max-w-2xl max-h-[90vh] flex flex-col bg-white dark:bg-stone-900 border border-cream-300 dark:border-stone-700 rounded-2xl shadow-2xl animate-slide-up mx-4">
+            {/* Modal header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-cream-300 dark:border-stone-800 shrink-0">
+              <h3 className="font-bold text-stone-900 dark:text-white">
+                {editingItem ? "Edit Item" : "Create Item"}
+              </h3>
+              <button onClick={() => setModalOpen(false)}
+                className="p-1.5 rounded-lg text-stone-400 hover:text-stone-600 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors">
+                <X size={17} />
               </button>
             </div>
-            <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            
+            <div className="flex-1 overflow-y-auto px-6 py-5 space-y-5">
               <div>
                 <label className="block text-xs font-semibold text-stone-500 uppercase tracking-wide mb-1.5">Name *</label>
                 <input
@@ -354,8 +357,8 @@ export default function MenuManager() {
                 </div>
               </div>
 
-              <div className="sm:col-span-2 flex gap-3 pt-2">
-                <button type="submit" disabled={saving} className="btn-primary flex-1">
+              <div className="flex gap-3 px-6 py-4 border-t border-cream-300 dark:border-stone-800 shrink-0">
+                <button type="submit" disabled={saving} onClick ={handleSubmit} className="btn-primary flex-1">
                   {saving ? (
                     <span className="flex items-center justify-center gap-2">
                       <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -365,7 +368,7 @@ export default function MenuManager() {
                 </button>
                 <button type="button" onClick={closeModal} className="btn-secondary">Cancel</button>
               </div>
-            </form>
+            </div>
           </div>
         </div>
       )}
