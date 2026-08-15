@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Bell, CheckCheck, Package, Megaphone, Settings, Trash2, RefreshCw } from "lucide-react";
+import { Bell, CheckCheck, Package, Megaphone, Settings, Trash2, RefreshCw, Bike } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { useNotificationContext } from "../context/NotificationContext";
 import { formatDistanceToNow, format, isToday, isYesterday } from "date-fns";
@@ -15,9 +15,10 @@ const FILTER_TABS = [
 ];
 
 const NOTIF_CONFIG = {
-  order:  { icon: <Package  size={18} />, color: "bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400", label: "Order Update" },
-  promo:  { icon: <Megaphone size={18} />, color: "bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400", label: "Promotion"   },
-  system: { icon: <Settings  size={18} />, color: "bg-blue-100   dark:bg-blue-900/30   text-blue-600   dark:text-blue-400",   label: "System"      },
+  order:            { icon: <Package  size={18} />, color: "bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400", label: "Order Update" },
+  promo:            { icon: <Megaphone size={18} />, color: "bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400", label: "Promotion"   },
+  system:           { icon: <Settings  size={18} />, color: "bg-blue-100   dark:bg-blue-900/30   text-blue-600   dark:text-blue-400",   label: "System"      },
+  delivery_request: { icon: <Bike      size={18} />, color: "bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400", label: "Delivery Request" },
 };
 
 function getTimeAgo(dateStr) {
@@ -80,6 +81,8 @@ export default function NotificationsPage() {
     if (notif.orderId) {
       if (user?.role === "restaurant_owner") {
         navigate("/dashboard/orders");
+      } else if (user?.role === "delivery_driver") {
+        navigate("/driver/active");
       } else {
         navigate(`/orders/${notif.orderId}`);
       }
@@ -242,7 +245,9 @@ export default function NotificationsPage() {
             </h3>
             <p className="text-gray-500 dark:text-gray-400">
               {activeFilter === "all"
-                ? "When you place orders or receive updates, they'll appear here."
+                ? (user?.role === "delivery_driver"
+                  ? "New delivery requests and updates will appear here."
+                  : "When you place orders or receive updates, they'll appear here.")
                 : (
                   <button
                     onClick={() => setActiveFilter("all")}
@@ -294,9 +299,10 @@ export default function NotificationsPage() {
                             <div className="flex-1 min-w-0">
                               <span className={clsx(
                                 "text-xs font-semibold uppercase tracking-wide",
-                                notif.type === "order"  ? "text-orange-600 dark:text-orange-400" :
-                                notif.type === "promo"  ? "text-purple-600 dark:text-purple-400" :
-                                                          "text-blue-600   dark:text-blue-400"
+                                notif.type === "order"            ? "text-orange-600 dark:text-orange-400" :
+                                notif.type === "promo"            ? "text-purple-600 dark:text-purple-400" :
+                                notif.type === "delivery_request" ? "text-primary-600 dark:text-primary-400" :
+                                                                    "text-blue-600   dark:text-blue-400"
                               )}>
                                 {config.label}
                               </span>
@@ -339,7 +345,7 @@ export default function NotificationsPage() {
                             <p className="text-xs text-gray-400 dark:text-gray-500">{timeAgo}</p>
                             {notif.orderId && (
                               <span className="text-xs text-primary-500 dark:text-primary-400 font-medium bg-primary-50 dark:bg-primary-900/20 px-2 py-0.5 rounded-full group-hover:bg-primary-100 dark:group-hover:bg-primary-900/30 transition-colors">
-                                View order →
+                                {user?.role === "delivery_driver" ? "View delivery →" : "View order →"}
                               </span>
                             )}
                           </div>

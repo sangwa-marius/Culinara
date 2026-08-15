@@ -200,10 +200,12 @@ export default function App() {
 
               {/* ── Driver portal — ONE parent route keeps DriverLayout mounted ── */}
               <Route element={<DriverPortal />}>
-                <Route path="/driver"            element={<DriverDashboard />} />
-                <Route path="/driver/available"  element={<DriverDashboard />} />
-                <Route path="/driver/active"     element={<DriverDashboard />} />
-                <Route path="/driver/history"    element={<DriverDashboard />} />
+                <Route index                  element={<DriverDashboard />} />
+                <Route path="available"       element={<DriverDashboard />} />
+                <Route path="active"          element={<DriverDashboard />} />
+                <Route path="history"         element={<DriverDashboard />} />
+                <Route path="notifications"   element={<Notifications />} />
+                <Route path="profile"         element={<Profile />} />
               </Route>
 
               {/* ── Admin portal — ONE parent route keeps AdminLayout mounted ── */}
