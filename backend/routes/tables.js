@@ -82,7 +82,7 @@ router.post("/:restaurantId", protect, authorize("restaurant_owner", "admin"), a
   try {
     await verifyOwner(req.params.restaurantId, req.user._id);
     const { number, capacity, location } = req.body;
-    const existing = await Table.findOne({ restaurant: req.params.restaurantId, number });
+    const existing = await Table.findOne({ restaurant: req.params.restaurantId, number, isActive: true });
     if (existing) return res.status(400).json({ success: false, message: `Table ${number} already exists` });
     const table = await Table.create({ restaurant: req.params.restaurantId, number, capacity, location });
     const created = await enrichTable(await Table.findById(table._id).lean());
