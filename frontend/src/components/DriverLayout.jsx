@@ -17,9 +17,9 @@ const NAV = [
   { to: "/driver/history",   label: "History",          icon: ClipboardList },
 ];
 const BOTTOM = [
-  { to: "/notifications", label: "Notifications", icon: Bell,   badge: true },
-  { to: "/profile",       label: "Profile",        icon: User },
-  { to: "/",              label: "Back to App",    icon: Home },
+  { to: "/driver/notifications", label: "Notifications", icon: Bell,   badge: true },
+  { to: "/driver/profile",       label: "Profile",        icon: User },
+  { to: "/",                     label: "Back to App",    icon: Home },
 ];
 
 export default function DriverLayout() {
@@ -77,7 +77,7 @@ export default function DriverLayout() {
           <Link key={to} to={to} onClick={() => setSidebarOpen(false)}
             className={clsx("flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 border-l-2",
               isActive({ to, exact })
-                ? "bg-primary-50 dark:bg-primary-950/20 border-primary-500 text-primary-600 dark:text-primary-400"
+                ? "bg-primary-500 dark:bg-primary-500 border-primary-500 text-white dark:text-whitie"
                 : "border-transparent text-stone-500 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-100 hover:bg-cream-200 dark:hover:bg-stone-800")}>
             <Icon size={16} className="shrink-0" />{label}
           </Link>
