@@ -141,6 +141,7 @@ export default function RestaurantAnalytics() {
                   cy="50%"
                   labelLine={false}
                   label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+                  innerRadius={60}
                   outerRadius={100}
                   fill="#8884d8"
                   dataKey="value"
@@ -170,6 +171,7 @@ export default function RestaurantAnalytics() {
                   cy="50%"
                   labelLine={false}
                   label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+                  innerRadius={60}
                   outerRadius={100}
                   fill="#8884d8"
                   dataKey="value"
