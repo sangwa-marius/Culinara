@@ -77,7 +77,6 @@ export default function Tables() {
         toast.success("Table updated");
       } else {
         const { data } = await api.post(`/tables/${rid}`, form);
-        setTables(p => [...p, data.table]);
         toast.success("Table added");
       }
       setModal(false);
