@@ -101,22 +101,22 @@ export default function KitchenDisplay() {
     <div className="flex flex-col h-full overflow-hidden">
 
       {/* Sub-header */}
-      <div className="bg-white dark:bg-stone-900 border-b border-cream-300 dark:border-stone-800 px-3 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between shrink-0 gap-2">
+      <div className="bg-white dark:bg-transparent border-b border-cream-300 dark:border-stone-800 px-3 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between shrink-0 gap-2">
         <div className="flex items-center gap-2">
           <button onClick={() => setShowQueue(!showQueue)} className="lg:hidden p-1 -ml-1 rounded text-stone-500 hover:text-stone-800 hover:bg-cream-200 transition-all">
             <PanelLeftClose size={16} />
           </button>
           <ChefHat size={16} className="sm:hidden text-primary-500" />
           <ChefHat size={17} className="hidden sm:block text-primary-500" />
-          <span className="font-bold text-stone-900 dark:text-white text-xs sm:text-sm">Kitchen Display System</span>
+          <span className="font-bold text-stone-800 dark:text-white text-xs sm:text-sm">Kitchen Display System</span>
         </div>
         <div className="flex items-center gap-2 sm:gap-3 text-[10px] sm:text-xs">
-          <div className="hidden sm:flex items-center gap-2 bg-cream-200 dark:bg-stone-800 px-3 py-1.5 rounded-lg">
+          <div className="hidden sm:flex items-center gap-2  dark:bg-transparent px-3 py-1.5 rounded-lg">
             <Zap size={12} className="text-amber-500" />
             <span className="text-stone-400">AVG PREP</span>
             <span className="font-bold text-stone-900 dark:text-white">14:20 min</span>
           </div>
-          <div className="flex items-center gap-1.5 bg-cream-200 dark:bg-stone-800 px-2 sm:px-3 py-1.5 rounded-lg">
+          <div className="flex items-center gap-1.5 dark:bg-transparent px-2 sm:px-3 py-1.5 rounded-lg">
             <span className="text-stone-400 hidden sm:inline">LOAD</span>
             <span className={clsx("font-black text-[10px] sm:text-xs", loadColor)}>{loadStr}</span>
           </div>
