@@ -112,7 +112,7 @@ export default function RestaurantAnalytics() {
             <p className="py-10 text-center text-stone-400 text-sm">No data for this week</p>
           ) : (
             <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={weekOrders}>
+              <BarChart data={weekOrders}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                 <XAxis dataKey="_id" tick={{ fontSize: 11 }} stroke="#9ca3af" />
                 <YAxis tick={{ fontSize: 11 }} stroke="#9ca3af" />
@@ -121,9 +121,9 @@ export default function RestaurantAnalytics() {
                   formatter={(value, name) => [name === "revenue" ? `$${value.toFixed(2)}` : value, name === "revenue" ? "Revenue" : "Orders"]}
                 />
                 <Legend />
-                <Line type="monotone" dataKey="orders" name="Orders" stroke="#B5390D" strokeWidth={2} />
-                <Line type="monotone" dataKey="revenue" name="Revenue" stroke="#f59e0b" strokeWidth={2} />
-              </LineChart>
+                <Bar dataKey="orders" name="Orders" fill="#B5390D" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="revenue" name="Revenue" fill="#f59e0b" radius={[4, 4, 0, 0]} />
+              </BarChart>
             </ResponsiveContainer>
           )}
         </div>
