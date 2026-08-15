@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Bell, CheckCheck, Package, Megaphone, Settings, Trash2, RefreshCw, Bike } from "lucide-react";
+import { Bell, CheckCheck, Package, Megaphone, Settings, Trash2, RefreshCw, Bike, Phone, MapPin, X, PackageOpen } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { useNotificationContext } from "../context/NotificationContext";
+import { orderAPI } from "../services/api";
 import { formatDistanceToNow, format, isToday, isYesterday } from "date-fns";
 import clsx from "clsx";
 import toast from "react-hot-toast";
@@ -55,6 +56,9 @@ export default function NotificationsPage() {
   const navigate      = useNavigate();
   const [activeFilter, setActiveFilter] = useState("all");
   const [confirmClearAll, setConfirmClearAll] = useState(false);
+  const [selectedNotif, setSelectedNotif] = useState(null);
+  const [orderDetails, setOrderDetails] = useState(null);
+  const [orderLoading, setOrderLoading] = useState(false);
 
   const {
     notifications,
@@ -76,13 +80,32 @@ export default function NotificationsPage() {
   const grouped = groupByDate(filtered);
 
   // ── Handlers ─────────────────────────────────────────────────────────────────
+  const openDeliveryPopup = async (notif) => {
+    if (!notif.isRead) markOneRead(notif._id);
+    if (!notif.orderId) return;
+    setSelectedNotif(notif);
+    setOrderLoading(true);
+    setOrderDetails(null);
+    try {
+      const { data } = await orderAPI.getOne(notif.orderId);
+      setOrderDetails(data.order || null);
+    } catch {
+      toast.error("Failed to load delivery details");
+      setSelectedNotif(null);
+    } finally {
+      setOrderLoading(false);
+    }
+  };
+
   const handleClick = (notif) => {
+    if (notif.type === "delivery_request" && user?.role === "delivery_driver") {
+      openDeliveryPopup(notif);
+      return;
+    }
     if (!notif.isRead) markOneRead(notif._id);
     if (notif.orderId) {
       if (user?.role === "restaurant_owner") {
         navigate("/dashboard/orders");
-      } else if (user?.role === "delivery_driver") {
-        navigate("/driver/active");
       } else {
         navigate(`/orders/${notif.orderId}`);
       }
@@ -143,6 +166,114 @@ export default function NotificationsPage() {
                 <Trash2 size={15} /> Clear all
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delivery Details Popup */}
+      {selectedNotif && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setSelectedNotif(null)} />
+          <div className="relative bg-white dark:bg-stone-900 border border-cream-300 dark:border-stone-700 rounded-2xl shadow-2xl w-full max-w-md animate-slide-up max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white dark:bg-stone-900 border-b border-cream-300 dark:border-stone-800 px-5 py-4 flex items-center justify-between z-10 rounded-t-2xl">
+              <h3 className="font-bold text-stone-900 dark:text-white">Delivery Details</h3>
+              <button onClick={() => setSelectedNotif(null)} className="p-1.5 rounded-lg text-stone-400 hover:text-stone-600 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors">
+                <X size={17} />
+              </button>
+            </div>
+
+            {orderLoading ? (
+              <div className="p-10 flex flex-col items-center gap-3">
+                <div className="w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full animate-spin" />
+                <p className="text-sm text-gray-400 dark:text-gray-500">Loading delivery details…</p>
+              </div>
+            ) : orderDetails ? (
+              <div className="p-5 space-y-4">
+                {/* Order header */}
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="font-bold text-stone-900 dark:text-white text-lg">#{orderDetails.orderNumber}</p>
+                    <p className="text-xs text-stone-400 mt-0.5">{orderDetails.items?.length || 0} items</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-black text-xl text-primary-500">${orderDetails.total?.toFixed(2)}</p>
+                    {orderDetails.deliveryFee && (
+                      <p className="text-xs text-green-600 dark:text-green-400 font-medium">+${orderDetails.deliveryFee.toFixed(2)} delivery fee</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Route */}
+                <div className="bg-cream-100 dark:bg-stone-800 rounded-xl p-4 space-y-3">
+                  <div className="flex gap-3">
+                    <div className="flex flex-col items-center gap-1 pt-1 shrink-0">
+                      <div className="w-3 h-3 rounded-full bg-primary-500 ring-4 ring-primary-100 dark:ring-primary-900/30" />
+                      <div className="w-0.5 flex-1 bg-cream-400 dark:bg-stone-600 min-h-[20px]" />
+                      <div className="w-3 h-3 rounded-full bg-green-500 ring-4 ring-green-100 dark:ring-green-900/30" />
+                    </div>
+                    <div className="flex-1 space-y-3">
+                      <div>
+                        <p className="text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-0.5">Pick Up</p>
+                        <p className="font-semibold text-stone-900 dark:text-white text-sm">{orderDetails.restaurant?.name || "Restaurant"}</p>
+                        {orderDetails.restaurant?.address && (
+                          <p className="text-xs text-stone-500">{orderDetails.restaurant.address.street}, {orderDetails.restaurant.address.city}</p>
+                        )}
+                        {orderDetails.restaurant?.phone && (
+                          <a href={`tel:${orderDetails.restaurant.phone}`} className="text-xs text-primary-500 hover:text-primary-600 flex items-center gap-1 mt-0.5">
+                            <Phone size={10} />{orderDetails.restaurant.phone}
+                          </a>
+                        )}
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-0.5">Drop Off</p>
+                        {orderDetails.deliveryAddress ? (
+                          <p className="font-semibold text-stone-900 dark:text-white text-sm">
+                            {[orderDetails.deliveryAddress.street, orderDetails.deliveryAddress.city].filter(Boolean).join(", ")}
+                          </p>
+                        ) : (
+                          <p className="text-sm text-stone-400 italic">Address on file</p>
+                        )}
+                        {orderDetails.customer?.phone && (
+                          <a href={`tel:${orderDetails.customer.phone}`} className="text-xs text-primary-500 hover:text-primary-600 flex items-center gap-1 mt-0.5">
+                            <Phone size={10} />{orderDetails.customer.phone}
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Items */}
+                {orderDetails.items?.length > 0 && (
+                  <div>
+                    <p className="text-xs font-bold text-stone-500 uppercase tracking-wider mb-2">Items</p>
+                    <div className="space-y-1.5">
+                      {orderDetails.items.slice(0, 4).map((item, i) => (
+                        <div key={i} className="flex justify-between text-sm">
+                          <span className="text-stone-600 dark:text-stone-300">{item.quantity}× {item.name}</span>
+                          <span className="text-stone-500 font-medium">${(item.price * item.quantity).toFixed(2)}</span>
+                        </div>
+                      ))}
+                      {orderDetails.items.length > 4 && (
+                        <p className="text-xs text-stone-400 italic">+{orderDetails.items.length - 4} more items</p>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Actions */}
+                <div className="flex gap-3 pt-1">
+                  <button onClick={() => setSelectedNotif(null)} className="btn-secondary flex-1 py-2.5">Close</button>
+                  <button onClick={() => { setSelectedNotif(null); navigate("/driver/active"); }} className="btn-primary flex-1 py-2.5 gap-2">
+                    <PackageOpen size={15} /> View in Deliveries
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="p-10 text-center">
+                <p className="text-sm text-stone-400">No details available</p>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -344,9 +475,19 @@ export default function NotificationsPage() {
                           <div className="flex items-center gap-3 mt-2 flex-wrap">
                             <p className="text-xs text-gray-400 dark:text-gray-500">{timeAgo}</p>
                             {notif.orderId && (
-                              <span className="text-xs text-primary-500 dark:text-primary-400 font-medium bg-primary-50 dark:bg-primary-900/20 px-2 py-0.5 rounded-full group-hover:bg-primary-100 dark:group-hover:bg-primary-900/30 transition-colors">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  if (user?.role === "delivery_driver" && notif.type === "delivery_request") {
+                                    openDeliveryPopup(notif);
+                                  } else {
+                                    handleClick(notif);
+                                  }
+                                }}
+                                className="text-xs text-primary-500 dark:text-primary-400 font-medium bg-primary-50 dark:bg-primary-900/20 px-2 py-0.5 rounded-full hover:bg-primary-100 dark:hover:bg-primary-900/30 transition-colors"
+                              >
                                 {user?.role === "delivery_driver" ? "View delivery →" : "View order →"}
-                              </span>
+                              </button>
                             )}
                           </div>
                         </div>
