@@ -47,7 +47,7 @@ export default function Restaurants() {
   const pages = Math.ceil(total / 12);
 
   return (
-    <div className="min-h-screen bg-cream-200 dark:bg-stone-950 pt-20">
+    <div className="min-h-screen bg-cream-200 dark:bg-stone-950">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="py-8">
           <h1 className="font-display text-3xl font-bold text-stone-900 dark:text-white">Find your next culinary adventure</h1>
