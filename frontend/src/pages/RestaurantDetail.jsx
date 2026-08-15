@@ -99,6 +99,10 @@ export default function RestaurantDetail() {
       toast.error("You can't order from your own restaurant");
       return;
     }
+    if (!restaurant?.isOpen) {
+      toast.error("This restaurant is currently closed");
+      return;
+    }
     const added = addToCart(item, restaurant);
     // If addToCart returns false it means user is switching restaurants
     // — the ConfirmDialog will appear automatically via pendingSwitch state
@@ -123,6 +127,10 @@ export default function RestaurantDetail() {
     if (!user) { toast.error("Please login to add items to cart"); return; }
     if (user.role === "restaurant_owner" && restaurant?.owner?._id?.toString() === user.id) {
       toast.error("You can't order from your own restaurant");
+      return;
+    }
+    if (!restaurant?.isOpen) {
+      toast.error("This restaurant is currently closed");
       return;
     }
     selectedCollection.items.forEach(item => {

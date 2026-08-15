@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { TrendingUp, Package, DollarSign, Star, Clock, ArrowRight } from "lucide-react";
+import { TrendingUp, Package, DollarSign, Star, Clock, ArrowRight, Power } from "lucide-react";
 import { restaurantAPI, orderAPI, analyticsAPI } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 import { joinRestaurantRoom, getSocket } from "../../utils/socket";
@@ -16,6 +16,22 @@ export default function RestaurantDashboard() {
   const [orders,     setOrders]     = useState([]);
   const [analytics, setAnalytics]   = useState(null);
   const [loading,    setLoading]    = useState(true);
+  const [toggling,   setToggling]   = useState(false);
+
+  const toggleOpen = async () => {
+    if (!restaurant || toggling) return;
+    setToggling(true);
+    try {
+      const next = !restaurant.isOpen;
+      const { data } = await restaurantAPI.update(restaurant._id, { isOpen: next });
+      setRestaurant(data.restaurant);
+      toast.success(next ? "Restaurant is now open" : "Restaurant is now closed");
+    } catch {
+      toast.error("Failed to update status");
+    } finally {
+      setToggling(false);
+    }
+  };
 
   useEffect(() => {
     (async () => {
@@ -106,6 +122,30 @@ export default function RestaurantDashboard() {
           </div>
         ))}
       </div>
+
+      {/* Open/Close toggle */}
+      {restaurant && (
+        <div className="card p-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${restaurant.isOpen ? "bg-green-50 dark:bg-green-950/30 text-green-600" : "bg-red-50 dark:bg-red-950/30 text-red-600"}`}>
+              <Power size={20} />
+            </div>
+            <div>
+              <p className="font-bold text-stone-900 dark:text-white text-sm">Restaurant Status</p>
+              <p className={`text-xs font-medium ${restaurant.isOpen ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}>
+                {restaurant.isOpen ? "Currently Open" : "Currently Closed"}
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={toggleOpen}
+            disabled={toggling}
+            className={clsx("relative w-12 h-7 rounded-full transition-colors", restaurant.isOpen ? "bg-green-500" : "bg-stone-300", toggling && "opacity-70")}
+          >
+            <span className={clsx("absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow transition-transform", restaurant.isOpen ? "translate-x-5" : "translate-x-0")} />
+          </button>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-5">
         <div className="lg:col-span-2 card overflow-hidden">
