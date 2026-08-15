@@ -86,7 +86,7 @@ export default function RestaurantAnalytics() {
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: "Total Revenue", value: `$${totalRevenue.toFixed(2)}`, icon: DollarSign, color: "text-green-600 bg-green-50 dark:bg-green-950/30" },
+          { label: "Total Earnings", value: `$${totalRevenue.toFixed(2)}`, icon: DollarSign, color: "text-green-600 bg-green-50 dark:bg-green-950/30" },
           { label: "Total Orders", value: totalOrders, icon: Package, color: "text-blue-600 bg-blue-50 dark:bg-blue-950/30" },
           { label: "Avg Order Value", value: `$${avgOrderValue.toFixed(2)}`, icon: TrendingUp, color: "text-purple-600 bg-purple-50 dark:bg-purple-950/30" },
           { label: "Today's Orders", value: todayOrders, icon: Users, color: "text-amber-600 bg-amber-50 dark:bg-amber-950/30" },
