@@ -75,10 +75,10 @@ export default function DriverLayout() {
       <nav className="flex-1 px-3 py-3 space-y-0.5 overflow-y-auto">
         {NAV.map(({ to, label, icon: Icon, exact }) => (
           <Link key={to} to={to} onClick={() => setSidebarOpen(false)}
-            className={clsx("flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150",
+            className={clsx("flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 border-l-2",
               isActive({ to, exact })
-                ? "bg-primary-500 text-white"
-                : "text-stone-500 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-100 hover:bg-cream-200 dark:hover:bg-stone-800")}>
+                ? "bg-primary-50 dark:bg-primary-950/20 border-primary-500 text-primary-600 dark:text-primary-400"
+                : "border-transparent text-stone-500 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-100 hover:bg-cream-200 dark:hover:bg-stone-800")}>
             <Icon size={16} className="shrink-0" />{label}
           </Link>
         ))}
@@ -132,7 +132,7 @@ export default function DriverLayout() {
 
       <aside ref={sidebarRef}
         className={clsx(
-          "fixed inset-y-0 left-0 z-50 w-[200px] shrink-0 bg-white dark:bg-stone-950 border-r border-cream-300 dark:border-stone-800 flex flex-col transform transition-transform duration-300 ease-in-out",
+          "fixed inset-y-0 left-0 z-50 w-[200px] shrink-0 bg-white dark:bg-stone-950 border-r border-cream-300 dark:border-stone-800 flex flex-col transform transition-transform duration-300 ease-in-out shadow-lg md:shadow-none",
           "md:relative md:translate-x-0 md:z-auto",
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         )}>

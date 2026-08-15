@@ -453,20 +453,20 @@ function OrderCard({ order, expanded, onExpand, action }) {
       </div>
 
       {expanded && (
-        <div className="mt-4 pt-4 border-t border-cream-200 dark:border-stone-800 space-y-3 animate-fade-in">
+        <div className="mt-3 pt-3 border-t border-cream-200 dark:border-stone-800 space-y-3 animate-fade-in">
           {/* Route */}
           <div className="flex gap-3">
-            <div className="flex flex-col items-center gap-1 pt-1 shrink-0">
-              <div className="w-2.5 h-2.5 rounded-full bg-primary-500" />
-              <div className="w-px flex-1 bg-cream-300 dark:bg-stone-700 min-h-[24px]" />
-              <div className="w-2.5 h-2.5 rounded-full bg-green-500" />
+            <div className="flex flex-col items-center gap-1 pt-1.5 shrink-0">
+              <div className="w-3 h-3 rounded-full bg-primary-500 ring-4 ring-primary-100 dark:ring-primary-900/30" />
+              <div className="w-0.5 flex-1 bg-cream-300 dark:bg-stone-700 min-h-[20px]" />
+              <div className="w-3 h-3 rounded-full bg-green-500 ring-4 ring-green-100 dark:ring-green-900/30" />
             </div>
-            <div className="flex-1 space-y-2">
+            <div className="flex-1 space-y-2.5">
               <div>
                 <p className="text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-0.5">Pick Up</p>
                 <p className="text-xs font-semibold text-stone-800 dark:text-stone-200">{order.restaurant?.name}</p>
                 {order.restaurant?.address && (
-                  <p className="text-xs text-stone-400">{order.restaurant.address.street}, {order.restaurant.address.city}</p>
+                  <p className="text-xs text-stone-500">{order.restaurant.address.street}, {order.restaurant.address.city}</p>
                 )}
                 {order.restaurant?.phone && (
                   <a href={`tel:${order.restaurant.phone}`}
@@ -499,7 +499,7 @@ function OrderCard({ order, expanded, onExpand, action }) {
             {order.items?.map((item, i) => (
               <div key={i} className="flex justify-between text-xs">
                 <span className="text-stone-600 dark:text-stone-300">{item.quantity}× {item.name}</span>
-                <span className="text-stone-500">${(item.price * item.quantity).toFixed(2)}</span>
+                <span className="text-stone-500 font-medium">${(item.price * item.quantity).toFixed(2)}</span>
               </div>
             ))}
             <div className="pt-2 border-t border-cream-300 dark:border-stone-700 flex justify-between text-xs font-bold">
