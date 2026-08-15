@@ -10,6 +10,24 @@ import toast from "react-hot-toast";
 import ConfirmDialog from "../components/ConfirmDialog";
 import clsx from "clsx";
 
+const DAYS = ["sunday","monday","tuesday","wednesday","thursday","friday","saturday"];
+
+function isEffectivelyOpen(restaurant) {
+  if (!restaurant) return false;
+  if (restaurant.isOpen === false) return false;
+  const hours = restaurant.openingHours || {};
+  const today = DAYS[new Date().getDay()];
+  const todayHours = hours[today];
+  if (!todayHours || todayHours.isClosed) return false;
+  const [openH, openM] = (todayHours.open || "00:00").split(":").map(Number);
+  const [closeH, closeM] = (todayHours.close || "23:59").split(":").map(Number);
+  const now = new Date();
+  const current = now.getHours() * 60 + now.getMinutes();
+  const open = openH * 60 + openM;
+  const close = closeH * 60 + closeM;
+  return current >= open && current < close;
+}
+
 export default function RestaurantDetail() {
   const { id } = useParams();
   const { addToCart, cartItems, updateQuantity, removeFromCart, pendingSwitch, confirmSwitch, cancelSwitch } = useCart();
@@ -190,9 +208,9 @@ export default function RestaurantDetail() {
             </div>
             <span className={clsx(
               "shrink-0 px-3 py-1.5 rounded-full text-sm font-semibold shadow",
-              restaurant.isOpen ? "bg-green-500 text-white" : "bg-stone-700/90 text-white"
+              isEffectivelyOpen(restaurant) ? "bg-green-500 text-white" : "bg-stone-700/90 text-white"
             )}>
-              {restaurant.isOpen ? "🟢 Open" : "🔴 Closed"}
+              {isEffectivelyOpen(restaurant) ? "🟢 Open" : "🔴 Closed"}
             </span>
           </div>
         </div>

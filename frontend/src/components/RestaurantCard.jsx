@@ -3,8 +3,27 @@ import { Star, Clock, Bike, MapPin } from "lucide-react";
 import clsx from "clsx";
 import SafeImage from "./SafeImage";
 
+const DAYS = ["sunday","monday","tuesday","wednesday","thursday","friday","saturday"];
+
+function isEffectivelyOpen(restaurant) {
+  if (!restaurant) return false;
+  if (restaurant.isOpen === false) return false;
+  const hours = restaurant.openingHours || {};
+  const today = DAYS[new Date().getDay()];
+  const todayHours = hours[today];
+  if (!todayHours || todayHours.isClosed) return false;
+  const [openH, openM] = (todayHours.open || "00:00").split(":").map(Number);
+  const [closeH, closeM] = (todayHours.close || "23:59").split(":").map(Number);
+  const now = new Date();
+  const current = now.getHours() * 60 + now.getMinutes();
+  const open = openH * 60 + openM;
+  const close = closeH * 60 + closeM;
+  return current >= open && current < close;
+}
+
 export default function RestaurantCard({ restaurant }) {
   const { _id, name, cuisine, logo, coverImage, rating, deliveryFee, estimatedDeliveryTime, isOpen, description, totalRatings } = restaurant;
+  const effectiveOpen = isEffectivelyOpen(restaurant);
   return (
     <Link to={`/restaurants/${_id}`} className="group block bg-white dark:bg-stone-900 rounded-xl border border-cream-300 dark:border-stone-800 overflow-hidden hover:shadow-lg hover:shadow-stone-200/50 dark:hover:shadow-stone-950/50 hover:-translate-y-0.5 transition-all duration-300">
       {/* Cover */}
@@ -12,8 +31,8 @@ export default function RestaurantCard({ restaurant }) {
         <SafeImage src={coverImage} alt={name} className="w-full h-full" imgClass="object-cover group-hover:scale-105 transition-transform duration-500" fallback={<div className="w-full h-full flex items-center justify-center text-5xl">🍽️</div>} />
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
         <div className={clsx("absolute top-2.5 right-2.5 px-2 py-0.5 rounded-full text-xs font-semibold backdrop-blur-sm",
-          isOpen ? "bg-green-500/90 text-white" : "bg-stone-900/80 text-stone-300")}>
-          {isOpen ? "● Open" : "● Closed"}
+          effectiveOpen ? "bg-green-500/90 text-white" : "bg-stone-900/80 text-stone-300")}>
+          {effectiveOpen ? "● Open" : "● Closed"}
         </div>
         <div className="absolute -bottom-4 left-3.5 w-10 h-10 rounded-lg bg-white dark:bg-stone-900 shadow-md border border-cream-300 dark:border-stone-700 overflow-hidden">
           <SafeImage src={logo} alt={name} className="w-full h-full" imgClass="object-cover"
