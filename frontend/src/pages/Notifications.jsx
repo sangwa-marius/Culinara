@@ -264,8 +264,21 @@ export default function NotificationsPage() {
                 {/* Actions */}
                 <div className="flex gap-3 pt-1">
                   <button onClick={() => setSelectedNotif(null)} className="btn-secondary flex-1 py-2.5">Close</button>
-                  <button onClick={() => { setSelectedNotif(null); navigate("/driver/active"); }} className="btn-primary flex-1 py-2.5 gap-2">
-                    <PackageOpen size={15} /> View in Deliveries
+                  <button
+                    onClick={() => {
+                      setSelectedNotif(null);
+                      if (orderDetails?.status === "ready_for_pickup") navigate("/driver/available");
+                      else if (orderDetails?.status === "delivered") navigate("/driver/history");
+                      else navigate("/driver/active");
+                    }}
+                    className="btn-primary flex-1 py-2.5 gap-2"
+                  >
+                    <PackageOpen size={15} />{" "}
+                    {orderDetails?.status === "ready_for_pickup"
+                      ? "View in Available"
+                      : orderDetails?.status === "delivered"
+                        ? "View in History"
+                        : "View in My Deliveries"}
                   </button>
                 </div>
               </div>
