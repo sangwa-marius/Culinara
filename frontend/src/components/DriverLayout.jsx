@@ -17,8 +17,8 @@ const NAV = [
   { to: "/driver/history",   label: "History",          icon: ClipboardList },
 ];
 const BOTTOM = [
-  { to: "/notifications", label: "Notifications", icon: Bell,   badge: true },
-  { to: "/profile",       label: "Profile",        icon: User },
+  { to: "/driver/notifications", label: "Notifications", icon: Bell,   badge: true },
+  { to: "/driver/profile",       label: "Profile",        icon: User },
   { to: "/",              label: "Back to App",    icon: Home },
 ];
 
