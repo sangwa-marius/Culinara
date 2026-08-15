@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Eye, EyeOff, Mail, Lock } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, ChefHat } from "lucide-react";
 import { GoogleLogin } from "@react-oauth/google";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
@@ -59,12 +59,12 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen pt-20 grid md:grid-cols-5">
+    <div className="min-h-screen mt-8 grid md:grid-cols-5">
       {/* Left form */}
       <div className="flex items-center justify-center px-6 py-16 md:col-span-3">
         <div className="w-full max-w-sm">
           <div className="text-center mb-8">
-            <div className="w-12 h-12 bg-primary-500 rounded-xl flex items-center justify-center text-xl mx-auto mb-4">🍽️</div>
+            <div className="w-12 h-12 bg-primary-500 rounded-xl flex items-center justify-center text-xl mx-auto mb-4"><ChefHat className="text-white" /></div>
             <h1 className="font-display text-2xl font-bold text-stone-900 dark:text-white">{getGreeting()}</h1>
             <p className="text-stone-500 dark:text-stone-400 text-sm mt-1">Sign in to your account</p>
           </div>
@@ -86,7 +86,7 @@ export default function Login() {
               <div className="relative">
                 <Mail size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" />
                 <input type="email" required value={form.email} onChange={e => setForm({...form, email: e.target.value})}
-                  placeholder="Type your email address" className="input-field pl-10" />
+                  placeholder="Type your email address" className="input-field pl-10 py-3 bg-transparent dark:bg-transparent" />
               </div>
             </div>
             <div>
@@ -94,7 +94,7 @@ export default function Login() {
               <div className="relative">
                 <Lock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" />
                 <input type={show ? "text" : "password"} required value={form.password} onChange={e => setForm({...form, password: e.target.value})}
-                  placeholder="Type your password" className="input-field pl-10 pr-10" />
+                  placeholder="Type your password" className="input-field px-10 py-3 bg-transparent dark:bg-transparent" />
                 <button type="button" onClick={() => setShow(!show)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 transition-colors">
                   {show ? <EyeOff size={15} /> : <Eye size={15} />}
                 </button>
