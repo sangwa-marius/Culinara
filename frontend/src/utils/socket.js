@@ -9,3 +9,4 @@ export const initSocket = (userId) => {
 export const getSocket = () => socket;
 export const disconnectSocket = () => { if (socket) { socket.disconnect(); socket = null; } };
 export const joinRestaurantRoom = (restaurantId) => { socket?.emit("join_restaurant_room", restaurantId); };
+export const leaveUserRoom = (userId) => { socket?.emit("leave_user_room", userId); };

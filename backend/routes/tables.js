@@ -82,7 +82,7 @@ router.post("/:restaurantId", protect, authorize("restaurant_owner", "admin"), a
   try {
     await verifyOwner(req.params.restaurantId, req.user._id);
     const { number, capacity, location } = req.body;
-    const existing = await Table.findOne({ restaurant: req.params.restaurantId, number });
+    const existing = await Table.findOne({ restaurant: req.params.restaurantId, number, isActive: true });
     if (existing) return res.status(400).json({ success: false, message: `Table ${number} already exists` });
     const table = await Table.create({ restaurant: req.params.restaurantId, number, capacity, location });
     const created = await enrichTable(await Table.findById(table._id).lean());
@@ -111,10 +111,9 @@ router.delete("/:tableId", protect, authorize("restaurant_owner", "admin"), asyn
     if (!table) return res.status(404).json({ success: false, message: "Table not found" });
     if (req.user.role !== "admin") await verifyOwner(table.restaurant, req.user._id);
     const restaurantId = table.restaurant;
-    table.isActive = false;
-    await table.save();
+    await Table.findByIdAndDelete(table._id);
     try { emitTableRemoved(restaurantId, table._id); } catch {}
-    res.json({ success: true, message: "Table removed" });
+    res.json({ success: true, message: "Table deleted" });
   } catch (e) { res.status(e.status || 500).json({ success: false, message: e.message }); }
 });
 

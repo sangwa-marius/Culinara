@@ -3,7 +3,8 @@ import { Clock, Send, X, CheckCheck, LayoutDashboard, Store, Users, Bell, ChefHa
 import { adminAPI, restaurantAPI } from "../../services/api";
 import Sidebar from "../../components/Sidebar";
 import OrderStatusBadge from "../../components/OrderStatusBadge";
-import Spinner from "../../components/Spinner";
+import { StatCardSkeleton, CardSkeleton } from "../../components/Skeleton";
+import SafeAvatar from "../../components/SafeImage";
 import toast from "react-hot-toast";
 import { format } from "date-fns";
 import clsx from "clsx";
@@ -125,7 +126,19 @@ export default function AdminDashboard() {
         </div>
 
         <div className="p-6">
-          {loading ? <Spinner center /> : (
+          {loading ? (
+            <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                {Array.from({ length: 4 }).map((_, i) => <StatCardSkeleton key={i} />)}
+              </div>
+              {Array.from({ length: 2 }).map((_, i) => (
+                <div key={i} className="card p-4 sm:p-5 space-y-3">
+                  <Skeleton className="h-5 w-40 mb-4" />
+                  {Array.from({ length: 4 }).map((_, j) => <CardSkeleton key={j} />)}
+                </div>
+              ))}
+            </div>
+          ) : (
             <>
               {/* Overview */}
               {activeTab === "overview" && stats && (
@@ -235,9 +248,9 @@ export default function AdminDashboard() {
                     {users.map(u => (
                       <div key={u._id} className="px-5 py-4 flex items-center justify-between gap-4 hover:bg-cream-50 dark:hover:bg-stone-800/40 transition-colors">
                         <div className="flex items-center gap-3 flex-1 min-w-0">
-                          <div className="w-8 h-8 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full flex items-center justify-center text-white font-bold text-xs shrink-0">
-                            {u.name?.charAt(0).toUpperCase()}
-                          </div>
+                           <div className="w-8 h-8 rounded-full overflow-hidden shrink-0">
+                             <SafeAvatar src={u.avatar} name={u.name} size="w-8 h-8" textSize="text-xs" />
+                           </div>
                           <div className="min-w-0">
                             <p className="font-semibold text-stone-900 dark:text-white text-sm truncate">{u.name}</p>
                             <p className="text-xs text-stone-400 truncate">{u.email}</p>

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Plus, Edit2, Trash2, Eye, EyeOff, ChefHat, X } from "lucide-react";
 import { menuAPI, restaurantAPI } from "../../services/api";
-import Spinner from "../../components/Spinner";
+import { MenuCardSkeleton, Skeleton } from "../../components/Skeleton";
 import ImageUploader from "../../components/ImageUploader";
 import ConfirmDialog from "../../components/ConfirmDialog";
 import toast from "react-hot-toast";
@@ -118,10 +118,28 @@ export default function MenuManager() {
   const categories    = ["all", ...new Set(items.map((i) => i.category).filter(Boolean))];
   const filteredItems = filterCategory === "all" ? items : items.filter((i) => i.category === filterCategory);
 
-  if (loading) return <div className="flex items-center justify-center py-20"><Spinner /></div>;
+  if (loading) return (
+    <div className="min-h-screen bg-cream-100 dark:bg-stone-950 pt-20 px-4 pb-16">
+      <div className="max-w-5xl mx-auto py-6 space-y-5">
+        <div className="flex justify-between items-center">
+          <div className="space-y-2">
+            <Skeleton className="h-7 w-40" />
+            <Skeleton className="h-4 w-56" />
+          </div>
+          <Skeleton className="h-10 w-24 rounded-lg" />
+        </div>
+        <div className="flex gap-2">
+          {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-8 w-20 rounded-full" />)}
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {Array.from({ length: 6 }).map((_, i) => <MenuCardSkeleton key={i} />)}
+        </div>
+      </div>
+    </div>
+  );
 
   return (
-    <div className="min-h-screen bg-cream-100 dark:bg-stone-950 pt-20 px-4 pb-16">
+    <div className="min-h-screen bg-cream-100 dark:bg-stone-950 p-4 pb-16">
       <div className="max-w-5xl mx-auto py-6 space-y-5">
         <div className="flex justify-between items-center">
           <div>
@@ -142,7 +160,7 @@ export default function MenuManager() {
                 "px-4 py-2 rounded-full text-sm whitespace-nowrap capitalize font-medium transition-all",
                 filterCategory === cat
                   ? "bg-primary-500 text-white shadow-sm"
-                  : "bg-white dark:bg-stone-800 border border-cream-300 dark:border-stone-700 text-stone-600 dark:text-stone-300 hover:border-primary-300 dark:hover:border-primary-700"
+                  : "bg-white dark:bg-stone-900 border border-cream-300 dark:border-stone-700 text-stone-600 dark:text-stone-300 hover:border-primary-300 dark:hover:border-primary-700"
               )}
             >
               {cat === "all" ? "All Items" : cat}
@@ -236,18 +254,21 @@ export default function MenuManager() {
 
       {/* Add / Edit Modal */}
       {modalOpen && (
-        <div className="fixed inset-0 z-[150] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={closeModal} />
-          <div className="relative w-full max-w-2xl card p-6 animate-scale-in shadow-2xl shadow-black/20 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="text-xl font-bold text-stone-900 dark:text-white">
-                {editingItem ? "Edit Menu Item" : "Add New Menu Item"}
-              </h2>
-              <button onClick={closeModal} className="p-1.5 rounded-lg text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors">
-                <X size={18} />
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setModalOpen(false)} />
+          <div className="relative w-full max-w-2xl max-h-[90vh] flex flex-col bg-white dark:bg-stone-900 border border-cream-300 dark:border-stone-700 rounded-2xl shadow-2xl animate-slide-up mx-4">
+            {/* Modal header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-cream-300 dark:border-stone-800 shrink-0">
+              <h3 className="font-bold text-stone-900 dark:text-white">
+                {editingItem ? "Edit Item" : "Create Item"}
+              </h3>
+              <button onClick={() => setModalOpen(false)}
+                className="p-1.5 rounded-lg text-stone-400 hover:text-stone-600 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors">
+                <X size={17} />
               </button>
             </div>
-            <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            
+            <div className="flex-1 overflow-y-auto px-6 py-5 space-y-5">
               <div>
                 <label className="block text-xs font-semibold text-stone-500 uppercase tracking-wide mb-1.5">Name *</label>
                 <input
@@ -336,8 +357,8 @@ export default function MenuManager() {
                 </div>
               </div>
 
-              <div className="sm:col-span-2 flex gap-3 pt-2">
-                <button type="submit" disabled={saving} className="btn-primary flex-1">
+              <div className="flex gap-3 px-6 py-4 border-t border-cream-300 dark:border-stone-800 shrink-0">
+                <button type="submit" disabled={saving} onClick ={handleSubmit} className="btn-primary flex-1">
                   {saving ? (
                     <span className="flex items-center justify-center gap-2">
                       <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -347,7 +368,7 @@ export default function MenuManager() {
                 </button>
                 <button type="button" onClick={closeModal} className="btn-secondary">Cancel</button>
               </div>
-            </form>
+            </div>
           </div>
         </div>
       )}

@@ -1,11 +1,12 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { X, Users, Truck, Eye } from "lucide-react";
+import { X, Users, Truck, Eye, Wifi, WifiOff } from "lucide-react";
 import { orderAPI, restaurantAPI, driverAPI } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 import { joinRestaurantRoom, getSocket } from "../../utils/socket";
 import OrderStatusBadge from "../../components/OrderStatusBadge";
-import Spinner from "../../components/Spinner";
+import { OrderRowSkeleton, Skeleton } from "../../components/Skeleton";
+import SafeAvatar from "../../components/SafeImage";
 import toast from "react-hot-toast";
 import { format } from "date-fns";
 import clsx from "clsx";
@@ -161,7 +162,27 @@ export default function RestaurantOrders() {
 
   const filtered = activeTab === "all" ? orders : orders.filter(o => o.status === activeTab);
 
-  if (loading) return <div className="flex items-center justify-center py-20"><Spinner /></div>;
+  if (loading) return (
+    <div className="p-4 sm:p-6 space-y-4 sm:space-y-5">
+      <div className="flex items-center justify-between">
+        <div className="space-y-2">
+          <Skeleton className="h-7 w-32" />
+          <Skeleton className="h-4 w-48" />
+        </div>
+        <Skeleton className="h-5 w-16" />
+      </div>
+      <div className="card overflow-hidden">
+        <div className="px-4 sm:px-5 py-2.5 sm:py-3 border-b border-cream-300 dark:border-stone-800 flex gap-1.5">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Skeleton key={i} className="h-7 w-16 rounded-lg" />
+          ))}
+        </div>
+        <div className="divide-y divide-cream-200 dark:divide-stone-800">
+          {Array.from({ length: 6 }).map((_, i) => <OrderRowSkeleton key={i} />)}
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <div className="p-4 sm:p-6 space-y-4 sm:space-y-5">
@@ -180,7 +201,7 @@ export default function RestaurantOrders() {
             return (
               <button key={tab} onClick={() => setActiveTab(tab)}
                 className={clsx("px-2.5 sm:px-3 py-1.5 rounded-lg text-[10px] sm:text-xs font-semibold whitespace-nowrap transition-all",
-                  activeTab === tab ? "bg-primary-500 text-white" : "text-stone-500 hover:text-stone-800 hover:bg-cream-200 dark:hover:bg-stone-800")}>
+                  activeTab === tab ? "bg-primary-500 text-white" : "text-stone-500 hover:text-stone-800 dark:hover:bg-stone-900 dark:hover:text-stone-300")}>
                 {tab === "all" ? `All (${orders.length})` : tab.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase())}
                 {tab !== "all" && count > 0 && ` (${count})`}
               </button>
@@ -258,95 +279,103 @@ export default function RestaurantOrders() {
 
       {/* Order Detail Modal */}
       {selectedOrder && (
-        <div className="fixed inset-0 z-[160] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setSelectedOrder(null)} />
-          <div className="relative w-full max-w-lg card p-6 animate-scale-in shadow-2xl shadow-black/20 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-5">
+        <div className="fixed inset-0 z-[160] flex items-center justify-center">
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setSelectedOrder(null)} />
+          <div className="relative w-full max-w-2xl max-h-[90vh] flex flex-col bg-white dark:bg-stone-900 border border-cream-300 dark:border-stone-700 rounded-2xl shadow-2xl animate-slide-up mx-4">
+            {/* Modal header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-cream-300 dark:border-stone-800 shrink-0">
               <div className="flex items-center gap-3">
-                <h3 className="font-bold text-stone-900 dark:text-white text-lg">Order #{selectedOrder.orderNumber}</h3>
+                <h3 className="font-bold text-stone-900 dark:text-white">Order #{selectedOrder.orderNumber}</h3>
                 <OrderStatusBadge status={selectedOrder.status} />
               </div>
               <button onClick={() => setSelectedOrder(null)} className="p-1.5 rounded-lg text-stone-400 hover:text-stone-600 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors">
-                <X size={18} />
+                <X size={17} />
               </button>
             </div>
 
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-3">
-                <div className="bg-cream-100 dark:bg-stone-800 rounded-xl p-3">
-                  <p className="text-[10px] font-semibold text-stone-400 uppercase tracking-wide mb-1">Customer</p>
-                  <p className="text-sm font-semibold text-stone-900 dark:text-white">{selectedOrder.customer?.name}</p>
-                  <p className="text-xs text-stone-400">{selectedOrder.customer?.email}</p>
+            {/* Modal body — scrollable */}
+            <div className="flex-1 overflow-y-auto px-6 py-5">
+              <div className="space-y-5">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-cream-100 dark:bg-stone-800 rounded-xl p-3">
+                    <p className="text-[10px] font-semibold text-stone-400 uppercase tracking-wide mb-1">Customer</p>
+                    <p className="text-sm font-semibold text-stone-900 dark:text-white">{selectedOrder.customer?.name}</p>
+                    <p className="text-xs text-stone-400">{selectedOrder.customer?.email}</p>
+                  </div>
+                  <div className="bg-cream-100 dark:bg-stone-800 rounded-xl p-3">
+                    <p className="text-[10px] font-semibold text-stone-400 uppercase tracking-wide mb-1">Order Type</p>
+                    <p className="text-sm font-semibold text-stone-900 dark:text-white capitalize">{selectedOrder.orderType?.replace(/_/g, " ")}</p>
+                    {selectedOrder.tableNumber && <p className="text-xs text-stone-400">Table {selectedOrder.tableNumber}</p>}
+                  </div>
                 </div>
-                <div className="bg-cream-100 dark:bg-stone-800 rounded-xl p-3">
-                  <p className="text-[10px] font-semibold text-stone-400 uppercase tracking-wide mb-1">Order Type</p>
-                  <p className="text-sm font-semibold text-stone-900 dark:text-white capitalize">{selectedOrder.orderType?.replace(/_/g, " ")}</p>
-                  {selectedOrder.tableNumber && <p className="text-xs text-stone-400">Table {selectedOrder.tableNumber}</p>}
-                </div>
-              </div>
 
-              {selectedOrder.deliveryAddress && (
-                <div className="bg-cream-100 dark:bg-stone-800 rounded-xl p-3">
-                  <p className="text-[10px] font-semibold text-stone-400 uppercase tracking-wide mb-1">Delivery Address</p>
-                  <p className="text-sm text-stone-900 dark:text-white">
-                    {typeof selectedOrder.deliveryAddress === "string"
-                      ? selectedOrder.deliveryAddress
-                      : [selectedOrder.deliveryAddress.street, selectedOrder.deliveryAddress.city, selectedOrder.deliveryAddress.state, selectedOrder.deliveryAddress.zipCode].filter(Boolean).join(", ") || "No address provided"}
-                  </p>
-                </div>
-              )}
+                {selectedOrder.deliveryAddress && (
+                  <div className="bg-cream-100 dark:bg-stone-800 rounded-xl p-3">
+                    <p className="text-[10px] font-semibold text-stone-400 uppercase tracking-wide mb-1">Delivery Address</p>
+                    <p className="text-sm text-stone-900 dark:text-white">
+                      {typeof selectedOrder.deliveryAddress === "string"
+                        ? selectedOrder.deliveryAddress
+                        : [selectedOrder.deliveryAddress.street, selectedOrder.deliveryAddress.city, selectedOrder.deliveryAddress.state, selectedOrder.deliveryAddress.zipCode].filter(Boolean).join(", ") || "No address provided"}
+                    </p>
+                  </div>
+                )}
 
-              <div>
-                <p className="text-[10px] font-semibold text-stone-400 uppercase tracking-wide mb-2">Items</p>
-                <div className="space-y-2">
-                  {(selectedOrder.items || []).map((item, idx) => (
-                    <div key={idx} className="flex items-center justify-between bg-cream-100 dark:bg-stone-800 rounded-xl px-4 py-3">
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-stone-900 dark:text-white truncate">{item.name}</p>
-                        <p className="text-xs text-stone-400">Qty: {item.quantity} · ${(item.price * item.quantity).toFixed(2)}</p>
-                        {(item.customizations || []).length > 0 && (
-                          <div className="flex flex-wrap gap-1 mt-1">
-                            {item.customizations.map((c, ci) => (
-                              <span key={ci} className="text-[10px] bg-cream-200 dark:bg-stone-700 text-stone-500 px-1.5 py-0.5 rounded-full">
-                                +{c.name} {c.price > 0 ? `($${c.price})` : ""}
-                              </span>
-                            ))}
-                          </div>
-                        )}
+                <div>
+                  <p className="text-[10px] font-semibold text-stone-400 uppercase tracking-wide mb-2">Items</p>
+                  <div className="space-y-2">
+                    {(selectedOrder.items || []).map((item, idx) => (
+                      <div key={idx} className="flex items-center justify-between bg-cream-100 dark:bg-stone-800 rounded-xl px-4 py-3">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-semibold text-stone-900 dark:text-white truncate">{item.name}</p>
+                          <p className="text-xs text-stone-400">Qty: {item.quantity} · ${(item.price * item.quantity).toFixed(2)}</p>
+                          {(item.customizations || []).length > 0 && (
+                            <div className="flex flex-wrap gap-1 mt-1">
+                              {item.customizations.map((c, ci) => (
+                                <span key={ci} className="text-[10px] bg-cream-200 dark:bg-stone-700 text-stone-500 px-1.5 py-0.5 rounded-full">
+                                  +{c.name} {c.price > 0 ? `($${c.price})` : ""}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        <span className="text-sm font-bold text-stone-900 dark:text-white ml-3">
+                          ${((item.price + (item.customizations || []).reduce((s, c) => s + (c.price || 0), 0)) * item.quantity).toFixed(2)}
+                        </span>
                       </div>
-                      <span className="text-sm font-bold text-stone-900 dark:text-white ml-3">
-                        ${((item.price + (item.customizations || []).reduce((s, c) => s + (c.price || 0), 0)) * item.quantity).toFixed(2)}
-                      </span>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
+
+                <div className="border-t border-cream-300 dark:border-stone-700 pt-3 space-y-1.5">
+                  <div className="flex justify-between text-xs text-stone-500">
+                    <span>Subtotal</span><span className="font-semibold">${selectedOrder.subtotal?.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-xs text-stone-500">
+                    <span>Delivery Fee</span><span className="font-semibold">${selectedOrder.deliveryFee?.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-xs text-stone-500">
+                    <span>Tax</span><span className="font-semibold">${selectedOrder.tax?.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-sm font-bold text-stone-900 dark:text-white pt-1.5">
+                    <span>Total</span><span>${selectedOrder.total?.toFixed(2)}</span>
+                  </div>
+                </div>
+
+                {selectedOrder.notes && (
+                  <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800/30 rounded-xl p-3">
+                    <p className="text-[10px] font-semibold text-amber-600 uppercase tracking-wide mb-1">Notes</p>
+                    <p className="text-sm text-amber-800 dark:text-amber-300">{selectedOrder.notes}</p>
+                  </div>
+                )}
               </div>
+            </div>
 
-              <div className="border-t border-cream-300 dark:border-stone-700 pt-3 space-y-1.5">
-                <div className="flex justify-between text-xs text-stone-500">
-                  <span>Subtotal</span><span className="font-semibold">${selectedOrder.subtotal?.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between text-xs text-stone-500">
-                  <span>Delivery Fee</span><span className="font-semibold">${selectedOrder.deliveryFee?.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between text-xs text-stone-500">
-                  <span>Tax</span><span className="font-semibold">${selectedOrder.tax?.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between text-sm font-bold text-stone-900 dark:text-white pt-1.5">
-                  <span>Total</span><span>${selectedOrder.total?.toFixed(2)}</span>
-                </div>
-              </div>
-
-              {selectedOrder.notes && (
-                <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800/30 rounded-xl p-3">
-                  <p className="text-[10px] font-semibold text-amber-600 uppercase tracking-wide mb-1">Notes</p>
-                  <p className="text-sm text-amber-800 dark:text-amber-300">{selectedOrder.notes}</p>
-                </div>
-              )}
-
+            {/* Modal footer */}
+            <div className="flex gap-3 px-6 py-4 border-t border-cream-300 dark:border-stone-800 shrink-0">
+              <button onClick={() => setSelectedOrder(null)} className="btn-secondary flex-1">Close</button>
               {getNextStatus(selectedOrder) && getNextLabel(selectedOrder) && (
                 <button onClick={() => updateStatus(selectedOrder._id, getNextStatus(selectedOrder))}
-                  className={clsx("w-full py-3 rounded-xl font-semibold transition-colors",
+                  className={clsx("flex-1 py-3 rounded-xl font-semibold transition-colors",
                     getNextStatus(selectedOrder) === "delivered"
                       ? "bg-green-500 hover:bg-green-600 text-white"
                       : "bg-primary-500 hover:bg-primary-600 text-white")}>
@@ -359,39 +388,50 @@ export default function RestaurantOrders() {
       )}
 
       {notifyId && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="card w-full max-w-md p-6 animate-scale-in">
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setNotifyId(null)} />
+          <div className="relative w-full max-w-md bg-white dark:bg-stone-900 border border-cream-300 dark:border-stone-700 rounded-2xl shadow-2xl p-6 animate-slide-up mx-4">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-bold text-stone-900 dark:text-white">Assign Driver</h3>
               <button onClick={() => setNotifyId(null)} className="p-1.5 rounded-lg text-stone-400 hover:text-stone-600 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors">
                 <X size={17} />
               </button>
             </div>
-            {notifyLoad ? <Spinner center /> : drivers.length === 0 ? (
-              <p className="text-stone-400 text-center py-6 text-sm">No available drivers</p>
-            ) : (
-              <div className="space-y-2 mb-4 max-h-60 overflow-y-auto">
-                {drivers.map(d => (
-                  <label key={d._id}
-                    className={clsx("flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all",
-                      selDriver === d._id ? "border-primary-500 bg-primary-50 dark:bg-primary-950/20" : "border-cream-300 dark:border-stone-700")}>
-                    <input type="radio" name="driver" value={d._id} checked={selDriver === d._id}
-                      onChange={() => setSelDriver(d._id)} className="accent-primary-500" />
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white font-bold text-xs">
-                      {d.name?.charAt(0)}
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold text-stone-900 dark:text-white">{d.name}</p>
-                      <p className="text-xs text-stone-400">{d.phone || "No phone"}</p>
-                    </div>
-                  </label>
-                ))}
-              </div>
-            )}
-            <div className="flex gap-3">
-              <button onClick={() => setNotifyId(null)} className="btn-secondary flex-1">Cancel</button>
-              <button onClick={notifyDriver} disabled={!selDriver} className="btn-primary flex-1">Notify Driver</button>
-            </div>
+             {notifyLoad ? <div className="py-8"><Skeleton className="h-8 w-8 rounded-full mx-auto" /></div> : drivers.length === 0 ? (
+               <p className="text-stone-400 text-center py-6 text-sm">No available drivers</p>
+             ) : (
+               <div className="space-y-2 mb-4 max-h-60 overflow-y-auto">
+                 {drivers.map(d => {
+                   const isOnline = !!d.isOnline;
+                   return (
+                   <label key={d._id}
+                     className={clsx("flex items-center gap-3 p-3 rounded-xl border-2 transition-all",
+                       selDriver === d._id ? "border-primary-500 bg-primary-50 dark:bg-primary-950/20" : "border-cream-300 dark:border-stone-700",
+                       !isOnline && "opacity-60")}>
+                     <input type="radio" name="driver" value={d._id} checked={selDriver === d._id}
+                       onChange={() => isOnline && setSelDriver(d._id)} disabled={!isOnline} className="accent-primary-500" />
+                      <div className="w-8 h-8 rounded-full overflow-hidden shrink-0">
+                        <SafeAvatar src={d.avatar} name={d.name} size="w-8 h-8" textSize="text-xs" />
+                      </div>
+                     <div className="flex-1 min-w-0">
+                       <div className="flex items-center gap-2">
+                         <p className="text-sm font-semibold text-stone-900 dark:text-white truncate">{d.name}</p>
+                         {isOnline
+                           ? <span className="shrink-0 w-2 h-2 rounded-full bg-green-500" title="Online" />
+                           : <span className="shrink-0 w-2 h-2 rounded-full bg-stone-400" title="Offline" />}
+                       </div>
+                       <p className="text-xs text-stone-400">{d.phone || "No phone"}</p>
+                       {!isOnline && <p className="text-[10px] text-red-500 font-medium">Offline — cannot notify</p>}
+                     </div>
+                   </label>
+                   );
+                 })}
+               </div>
+             )}
+             <div className="flex gap-3">
+               <button onClick={() => setNotifyId(null)} className="btn-secondary flex-1">Cancel</button>
+               <button onClick={notifyDriver} disabled={!selDriver} className="btn-primary flex-1">Notify Driver</button>
+             </div>
           </div>
         </div>
       )}

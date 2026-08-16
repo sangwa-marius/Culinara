@@ -15,7 +15,7 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (res) => res,
   (err) => {
-    if (err.response?.status === 401) {
+    if (err.response?.status === 401 && !err.config?.url?.includes("/auth/login")) {
       localStorage.removeItem("fh_token");
       localStorage.removeItem("fh_user");
       window.location.href = "/login";
@@ -38,6 +38,7 @@ export const authAPI = {
   markAllNotificationsRead: ()            => api.put("/auth/notifications/read-all"),
   deleteNotification:      (id)           => api.delete(`/auth/notifications/${id}`),
   deleteAllNotifications:  ()             => api.delete("/auth/notifications/all"),
+  toggleDriverOnline:      (isOnline)     => api.put("/auth/driver/online", { isOnline }),
 };
 
 export const restaurantAPI = {
@@ -99,6 +100,7 @@ export const driverAPI = {
   hideHistory:     (orderId)           => api.post(`/driver/history/${orderId}/hide`),
   acceptDelivery:  (orderId)           => api.put(`/driver/accept/${orderId}`),
   markDelivered:   (orderId)           => api.put(`/driver/deliver/${orderId}`),
+  declineOrder:    (orderId, reason)   => api.post(`/driver/decline/${orderId}`, { reason }),
   getStats:        ()                  => api.get("/driver/stats"),
   listDrivers:     ()                  => api.get("/driver/list"),
   notifyDriver:    (orderId, driverId) => api.post(`/driver/notify/${orderId}`, { driverId }),
@@ -120,6 +122,7 @@ export const collectionAPI = {
   create:  (restaurantId, data)=> api.post(`/collections/${restaurantId}`, data),
   update:  (id, data)          => api.put(`/collections/${id}`, data),
   delete:  (id)                => api.delete(`/collections/${id}`),
+  getPublic: (restaurantId)    => api.get(`/collections/${restaurantId}`),
 };
 
 export default api;

@@ -6,12 +6,10 @@ import { useNotificationContext } from "../context/NotificationContext";
 import {
   LayoutDashboard, Package, BookOpen, Layers, Armchair,
   ChefHat, BarChart3, Settings, Home, Sun, Moon, Bell,
-  LogOut, ChevronDown, User, ShoppingCart, Store, Menu, X,
+  LogOut, ChevronDown, User, Menu, X,
 } from "lucide-react";
+import SafeAvatar from "./SafeImage";
 import clsx from "clsx";
-
-const getAvatar = (user) => user?.avatar || "";
-const getInitial = (user) => user?.name?.charAt(0).toUpperCase() || "?";
 
 const GROUPS = [
   {
@@ -35,23 +33,13 @@ const GROUPS = [
       { to: "/dashboard/notifications",label: "Notifications", icon: Bell },
     ],
   },
-  {
-    id: "shopping",
-    label: "Shopping",
-    items: [
-      { to: "/cart",         label: "My Cart",           icon: ShoppingCart },
-      { to: "/restaurants",  label: "Browse Restaurants", icon: Store },
-    ],
-  },
 ];
 
 const TOP_ITEMS = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, exact: true },
 ];
 
-const BOTTOM_ITEMS = [
-  { to: "/", label: "Back to Home", icon: Home },
-];
+const BOTTOM_ITEMS = [];
 
 export default function RestaurantLayout() {
   const { user, logout }       = useAuth();
@@ -61,7 +49,7 @@ export default function RestaurantLayout() {
   const navigate  = useNavigate();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen]   = useState(false);
-  const [openGroups, setOpenGroups] = useState({ operations: true, account: false, shopping: false });
+  const [openGroups, setOpenGroups] = useState({ operations: true, account: false });
   const menuRef = useRef(null);
   const sidebarRef = useRef(null);
 
@@ -168,12 +156,8 @@ export default function RestaurantLayout() {
       <div className="px-3 py-3 border-t border-cream-300 dark:border-stone-800" ref={menuRef}>
         <button onClick={() => setUserMenuOpen(!userMenuOpen)}
           className="w-full flex items-center gap-2.5 px-2 py-1.5 rounded-lg hover:bg-cream-200 dark:hover:bg-stone-800 transition-colors">
-          <div className="w-7 h-7 rounded-full overflow-hidden bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white font-bold text-xs shrink-0">
-            {getAvatar(user) ? (
-              <img src={getAvatar(user)} alt={user?.name} className="w-full h-full object-cover" onError={(e) => { e.target.style.display = "none"; }} />
-            ) : (
-              getInitial(user)
-            )}
+          <div className="w-7 h-7 rounded-full overflow-hidden shrink-0">
+            <SafeAvatar src={user?.avatar} name={user?.name} size="w-7 h-7" textSize="text-xs" />
           </div>
           <div className="flex-1 min-w-0 text-left">
             <p className="text-xs font-semibold text-stone-800 dark:text-white truncate">{user?.name}</p>
@@ -188,7 +172,7 @@ export default function RestaurantLayout() {
             </Link>
             <Link to="/dashboard/notifications" className="flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-stone-600 dark:text-stone-300 hover:bg-cream-100 dark:hover:bg-stone-800 transition-colors">
               <Bell size={13} className="text-stone-400" /> Notifications
-              {unreadCount > 0 && <span className="ml-auto bg-red-500 text-white text-[9px] px-1.5 py-0.5 rounded-full font-bold">{unreadCount}</span>}
+              {unreadCount > 0 && <span className="ml-auto w-3.5 h-3.5 rounded-full flex items-center justify-center text-[8px] font-bold bg-red-500 text-white">{unreadCount > 9 ? "9+" : unreadCount}</span>}
             </Link>
             <div className="border-t border-cream-200 dark:border-stone-700" />
             <button onClick={handleLogout} className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors">
@@ -218,7 +202,7 @@ export default function RestaurantLayout() {
       </aside>
 
       <div className="flex-1 flex flex-col overflow-hidden min-w-0">
-        <header className="h-14 bg-white dark:bg-stone-900 border-b border-cream-300 dark:border-stone-800 flex items-center justify-between px-4 sm:px-6 shrink-0">
+        <header className="py-4 bg-white dark:bg-stone-950 border-b border-cream-300 dark:border-stone-800 flex items-center justify-between px-4 sm:px-6 shrink-0">
           <div className="flex items-center gap-3">
             <button onClick={() => setSidebarOpen(true)} className="md:hidden p-2 -ml-2 rounded-lg text-stone-500 hover:text-stone-800 dark:hover:text-stone-100 hover:bg-cream-200 dark:hover:bg-stone-800 transition-all">
               <Menu size={20} />
@@ -233,13 +217,13 @@ export default function RestaurantLayout() {
             <Link to="/dashboard/notifications" className="relative p-2 rounded-lg text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 hover:bg-cream-200 dark:hover:bg-stone-800 transition-all">
               <Bell size={16} />
               {unreadCount > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[9px] min-w-[15px] h-[15px] rounded-full flex items-center justify-center font-bold">
+                <span className="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[8px] w-3.5 h-3.5 rounded-full flex items-center justify-center font-bold">
                   {unreadCount > 9 ? "9+" : unreadCount}
                 </span>
               )}
             </Link>
-            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white font-bold text-xs ml-1 hidden sm:flex">
-              {getInitial(user)}
+            <div className="w-7 h-7 rounded-full overflow-hidden ml-1 hidden sm:flex">
+              <SafeAvatar src={user?.avatar} name={user?.name} size="w-7 h-7" textSize="text-xs" />
             </div>
           </div>
         </header>

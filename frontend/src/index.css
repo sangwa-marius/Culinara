@@ -97,6 +97,26 @@ html.dark ::-webkit-scrollbar-thumb { background: #44403c; }
 }
 .page-enter { animation: pageFade 0.35s ease-out both; }
 
+/* Auth visual animations */
+@keyframes authFloat {
+  0%   { transform: translateY(0px); }
+  50%  { transform: translateY(-14px); }
+  100% { transform: translateY(0px); }
+}
+.animate-float { animation: authFloat 4.5s ease-in-out infinite; }
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-slide-up { animation: slideUp 0.8s ease-out both; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in { animation: fadeIn 0.35s ease-out both; }
+
 /* Culinara gradient text */
 .culinara-text {
   background: linear-gradient(135deg, #C4511A 0%, #B5390D 60%, #8A2A08 100%);

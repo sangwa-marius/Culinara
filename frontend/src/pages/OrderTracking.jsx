@@ -9,7 +9,8 @@ import { orderAPI } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import { getSocket } from "../utils/socket";
 import OrderStatusBadge from "../components/OrderStatusBadge";
-import Spinner from "../components/Spinner";
+import { CardSkeleton, Skeleton } from "../components/Skeleton";
+import SafeAvatar from "../components/SafeImage";
 import toast from "react-hot-toast";
 import clsx from "clsx";
 
@@ -96,7 +97,21 @@ export default function OrderTracking() {
     } catch (err) { toast.error(err.response?.data?.message || "Failed to submit review"); }
   };
 
-  if (loading) return <div className="flex items-center justify-center py-20"><Spinner /></div>;
+  if (loading) return (
+    <div className="p-4 sm:p-6 max-w-3xl mx-auto space-y-4 sm:space-y-6">
+      <Skeleton className="h-6 w-40" />
+      <CardSkeleton lines={4} />
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className="card p-3 sm:p-4 space-y-2">
+            <Skeleton className="h-3 w-16" />
+            <Skeleton className="h-5 w-20" />
+          </div>
+        ))}
+      </div>
+      <CardSkeleton lines={5} />
+    </div>
+  );
   if (!order)  return (
     <div className="flex flex-col items-center justify-center py-20 text-center">
       <Package size={40} className="text-stone-300 mb-3" />
@@ -288,9 +303,9 @@ export default function OrderTracking() {
               </h2>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white font-bold">
-                    {order.driver.name?.charAt(0).toUpperCase()}
-                  </div>
+                   <div className="w-10 h-10 rounded-full overflow-hidden">
+                     <SafeAvatar src={order.driver?.avatar} name={order.driver?.name} size="w-10 h-10" textSize="text-base" />
+                   </div>
                   <div>
                     <p className="font-semibold text-stone-900 dark:text-white text-sm">{order.driver.name}</p>
                     <p className="text-xs text-stone-400">Delivery Driver</p>

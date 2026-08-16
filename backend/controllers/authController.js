@@ -21,6 +21,9 @@ const userPayload = (user) => ({
   phone:     user.phone,
   avatar:    user.avatar,
   addresses: user.addresses,
+  isOnline:  user.isOnline,
+  createdAt: user.createdAt,
+  updatedAt: user.updatedAt,
 });
 
 // @desc  Register
@@ -66,8 +69,11 @@ const login = async (req, res) => {
       });
     }
 
-    if (!user || !(await user.comparePassword(password)))
-      return res.status(401).json({ success: false, message: "Invalid email or password" });
+    if (!user)
+      return res.status(401).json({ success: false, message: "Email not registered" });
+
+    if (!(await user.comparePassword(password)))
+      return res.status(401).json({ success: false, message: "Invalid password" });
 
     if (!user.isActive)
       return res.status(401).json({ success: false, message: "Account has been deactivated. Contact support." });
@@ -350,10 +356,27 @@ const testEmail = async (req, res) => {
   }
 };
 
+const toggleDriverOnline = async (req, res) => {
+  try {
+    if (req.user.role !== "delivery_driver") {
+      return res.status(403).json({ success: false, message: "Only drivers can update online status" });
+    }
+    const user = await User.findByIdAndUpdate(
+      req.user.id,
+      { isOnline: req.body.isOnline },
+      { new: true }
+    ).select("-password");
+    res.json({ success: true, user });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 module.exports = {
   register, login, googleAuth,
   getMe, updateProfile, changePassword,
   forgotPassword, resetPassword, testEmail,
   getNotifications, markNotificationRead, markAllNotificationsRead,
   deleteNotification, deleteAllNotifications,
+  toggleDriverOnline,
 };

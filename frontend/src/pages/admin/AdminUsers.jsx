@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { Search, Users, RefreshCw, ShieldOff, ShieldCheck } from "lucide-react";
 import { adminAPI } from "../../services/api";
 import ConfirmDialog from "../../components/ConfirmDialog";
-import Spinner from "../../components/Spinner";
+import { CardSkeleton, Skeleton } from "../../components/Skeleton";
+import SafeAvatar from "../../components/SafeImage";
 import toast from "react-hot-toast";
 
 const ROLE_COLORS = {
@@ -58,7 +59,43 @@ export default function AdminUsers() {
 
   const roleCounts = users.reduce((acc, u) => { acc[u.role] = (acc[u.role] || 0) + 1; return acc; }, {});
 
-  if (loading) return <div className="flex items-center justify-center py-20"><Spinner /></div>;
+  if (loading) return (
+    <div className="p-4 sm:p-6 space-y-4 sm:space-y-5">
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <div className="space-y-2">
+          <Skeleton className="h-7 w-44" />
+          <Skeleton className="h-4 w-32" />
+        </div>
+        <Skeleton className="h-9 w-28 rounded-lg" />
+      </div>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className="card p-3 sm:p-4 flex items-center gap-2 sm:gap-3">
+            <Skeleton className="w-8 h-8 rounded-lg shrink-0" />
+            <div className="space-y-1.5 flex-1">
+              <Skeleton className="h-3 w-16" />
+              <Skeleton className="h-5 w-10" />
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="card overflow-hidden">
+        <div className="px-4 sm:px-5 py-3 border-b border-cream-300 dark:border-stone-800 flex gap-3">
+          {Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-3 w-20" />)}
+        </div>
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div key={i} className="px-4 sm:px-5 py-3 sm:py-4 flex items-center gap-3 sm:gap-4 border-b border-cream-200 dark:border-stone-800 last:border-b-0">
+            <Skeleton className="w-9 h-9 rounded-full shrink-0" />
+            <div className="flex-1 space-y-2">
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-3 w-48" />
+            </div>
+            <Skeleton className="h-6 w-20 rounded-full" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 
   return (
     <div className="p-6 space-y-5">
@@ -112,8 +149,8 @@ export default function AdminUsers() {
           ) : filtered.map(u => (
             <div key={u._id} className="px-5 py-4 flex items-center justify-between gap-4 hover:bg-cream-50 dark:hover:bg-stone-800/40 transition-colors">
               <div className="flex items-center gap-3 flex-1 min-w-0">
-                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white font-bold text-sm shrink-0">
-                  {u.name?.charAt(0).toUpperCase()}
+                <div className="w-9 h-9 rounded-full overflow-hidden shrink-0">
+                  <SafeAvatar src={u.avatar} name={u.name} size="w-9 h-9" textSize="text-sm" />
                 </div>
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">

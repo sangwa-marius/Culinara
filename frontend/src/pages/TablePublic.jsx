@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Armchair, Users, MapPin, Clock, Store, QrCode, ArrowLeft } from "lucide-react";
-import Spinner from "../components/Spinner";
+import { Skeleton } from "../components/Skeleton";
+import SafeAvatar from "../components/SafeImage";
 import toast from "react-hot-toast";
 import api from "../services/api";
 import clsx from "clsx";
@@ -31,7 +32,18 @@ export default function TablePublic() {
     })();
   }, [restaurantId, tableNumber]);
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center bg-cream-100 dark:bg-stone-950"><Spinner /></div>;
+  if (loading) return (
+    <div className="min-h-screen flex items-center justify-center bg-cream-100 dark:bg-stone-950">
+      <div className="space-y-3 w-full max-w-sm px-4">
+        <Skeleton className="h-48 w-full rounded-2xl" />
+        <div className="card p-5 space-y-3">
+          <Skeleton className="h-5 w-32" />
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-4 w-3/4" />
+        </div>
+      </div>
+    </div>
+  );
   if (!data?.table || !data?.restaurant) return (
     <div className="min-h-screen flex items-center justify-center bg-cream-100 dark:bg-stone-950 px-4">
       <div className="text-center">
@@ -98,9 +110,9 @@ export default function TablePublic() {
               {customers.map((c, idx) => (
                 <div key={idx} className="flex items-center justify-between bg-cream-100 dark:bg-stone-800 rounded-xl px-4 py-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white font-bold text-sm">
-                      {c.name?.charAt(0) || "?"}
-                    </div>
+                     <div className="w-9 h-9 rounded-full overflow-hidden">
+                       <SafeAvatar src={c.avatar} name={c.name} size="w-9 h-9" textSize="text-sm" />
+                     </div>
                     <div>
                       <p className="text-sm font-semibold text-stone-900 dark:text-white">{c.name}</p>
                       <p className="text-[10px] text-stone-400">{c.email}</p>

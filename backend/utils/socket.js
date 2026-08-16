@@ -26,6 +26,11 @@ const initSocket = (server) => {
       console.log(`✅ User ${userId} joined room user_${userId}`);
     });
 
+    socket.on("leave_user_room", (userId) => {
+      socket.leave(`user_${userId}`);
+      console.log(`🚪 User ${userId} left room user_${userId}`);
+    });
+
     socket.on("join_restaurant_room", (restaurantId) => {
       socket.join(`restaurant_${restaurantId}`);
       console.log(`🏪 Joined restaurant room: ${restaurantId}`);

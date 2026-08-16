@@ -29,7 +29,11 @@ export const useNotifications = (user) => {
     const socket = getSocket();
     if (!socket) return;
     const handler = (notif) => {
-      setNotifications(prev => [notif, ...prev]);
+      setNotifications(prev => {
+        const exists = prev.some(n => n._id === notif._id);
+        if (exists) return prev;
+        return [notif, ...prev];
+      });
       setUnreadCount(prev => prev + 1);
     };
     socket.on("new_notification", handler);

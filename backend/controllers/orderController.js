@@ -16,6 +16,24 @@ const STATUS_MESSAGES = {
   cancelled:        "Your order has been cancelled.",
 };
 
+const DAYS = ["sunday","monday","tuesday","wednesday","thursday","friday","saturday"];
+
+function isRestaurantOpen(restaurant) {
+  if (!restaurant) return false;
+  if (restaurant.isOpen === false) return false;
+  const hours = restaurant.openingHours || {};
+  const today = DAYS[new Date().getDay()];
+  const todayHours = hours[today];
+  if (!todayHours || todayHours.isClosed) return false;
+  const [openH, openM] = (todayHours.open || "00:00").split(":").map(Number);
+  const [closeH, closeM] = (todayHours.close || "23:59").split(":").map(Number);
+  const now = new Date();
+  const current = now.getHours() * 60 + now.getMinutes();
+  const open = openH * 60 + openM;
+  const close = closeH * 60 + closeM;
+  return current >= open && current < close;
+}
+
 // @desc  Place a new order
 // @route POST /api/orders
 const placeOrder = async (req, res) => {
@@ -27,6 +45,10 @@ const placeOrder = async (req, res) => {
 
     if (req.user.role === "restaurant_owner" && restaurant.owner.toString() === req.user.id) {
       return res.status(403).json({ success: false, message: "You cannot place an order at your own restaurant" });
+    }
+
+    if (!isRestaurantOpen(restaurant)) {
+      return res.status(403).json({ success: false, message: "This restaurant is currently closed. Please try again during opening hours." });
     }
 
     const subtotal = items.reduce((sum, item) => {
@@ -149,6 +171,7 @@ const getOrder = async (req, res) => {
     const isCustomer = order.customer._id.toString() === req.user.id;
     const isAdmin    = req.user.role === "admin";
     const isDriver   = order.driver && order.driver._id.toString() === req.user.id;
+    const isNotifiedDriver = req.user.role === "delivery_driver" && order.notifiedDrivers && order.notifiedDrivers.some(id => id.toString() === req.user.id);
 
     let ownerAuthorized = false;
     if (req.user.role === "restaurant_owner") {
@@ -156,7 +179,7 @@ const getOrder = async (req, res) => {
       ownerAuthorized = ownedRestaurant && ownedRestaurant._id.toString() === order.restaurant._id.toString();
     }
 
-    if (!isCustomer && !ownerAuthorized && !isDriver && !isAdmin) {
+    if (!isCustomer && !ownerAuthorized && !isDriver && !isAdmin && !isNotifiedDriver) {
       return res.status(403).json({ success: false, message: "Not authorized" });
     }
 
@@ -222,7 +245,7 @@ const getRestaurantOrders = async (req, res) => {
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(Number(limit))
-        .populate("customer", "name phone")
+        .populate("customer", "name phone avatar")
         .populate("driver",   "name phone")
         .lean(),
     ]);

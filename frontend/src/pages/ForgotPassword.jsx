@@ -26,11 +26,11 @@ export default function ForgotPassword() {
   };
 
   return (
-    <div className="min-h-screen pt-20 px-4 pb-16 bg-gray-50 flex items-center justify-center">
+    <div className="min-h-screen pt-20 px-4 pb-16 bg-gray-50 dark:bg-black/90 flex items-center justify-center">
       <div className="w-full max-w-md">
 
         {/* Back link */}
-        <Link to="/login" className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 mb-8 transition-colors">
+        <Link to="/login" className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 dark:hover:text-white mb-8 transition-colors">
           <ArrowLeft size={16} /> Back to login
         </Link>
 
@@ -38,12 +38,12 @@ export default function ForgotPassword() {
           {sent ? (
             /* ── Success State ── */
             <div className="text-center py-4">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-5">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-5 dark:bg-stone-800">
                 <CheckCircle size={32} className="text-green-500" />
               </div>
-              <h1 className="text-2xl font-bold text-gray-900 mb-3">Check your inbox</h1>
+              <h1 className="text-2xl font-bold text-gray-900 mb-3 dark:text-white">Check your inbox</h1>
               <p className="text-gray-500 leading-relaxed mb-6">
-                If an account with <strong className="text-gray-700">{email}</strong> exists, we've sent a password reset link. It expires in <strong>15 minutes</strong>.
+                If an account with <strong className="text-gray-700 dark:text-white">{email}</strong> exists, we've sent a password reset link. It expires in <strong>15 minutes</strong>.
               </p>
               <p className="text-sm text-gray-400 mb-6">
                 Didn't get it? Check your spam folder, or{" "}
@@ -62,18 +62,18 @@ export default function ForgotPassword() {
             /* ── Form State ── */
             <>
               <div className="text-center mb-8">
-                <div className="w-14 h-14 bg-primary-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <div className="w-14 h-14 bg-primary-50 dark:bg-stone-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <Mail size={28} className="text-primary-500" />
                 </div>
-                <h1 className="text-2xl font-bold text-gray-900 mb-2">Forgot your password?</h1>
-                <p className="text-gray-500 text-sm leading-relaxed">
+                <h1 className="text-2xl font-bold text-gray-900 mb-2 dark:text-white">Forgot your password?</h1>
+                <p className="dark:text-white/70 text-sm leading-relaxed">
                   No worries. Enter your email and we'll send you a reset link.
                 </p>
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-5">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label className="block text-sm font-medium dark:text-white mb-1.5">
                     Email address
                   </label>
                   <div className="relative">

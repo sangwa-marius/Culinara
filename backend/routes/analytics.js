@@ -16,10 +16,10 @@ router.get("/restaurant", protect, authorize("restaurant_owner","admin"), async 
     const weekAgo = new Date(now - 7*24*60*60*1000);
 
     const [totalRevenue, totalOrders, weekOrders, topDishes, ordersByStatus] = await Promise.all([
-      // Total revenue
+      // Total revenue — owner earnings = subtotal (excludes tax and delivery fee)
       Order.aggregate([
         { $match: { restaurant: rid, paymentStatus: "paid" } },
-        { $group: { _id: null, total: { $sum: "$total" }, avg: { $avg: "$total" } } },
+        { $group: { _id: null, total: { $sum: "$subtotal" }, avg: { $avg: "$subtotal" } } },
       ]),
       // Total orders
       Order.countDocuments({ restaurant: rid }),
@@ -29,7 +29,7 @@ router.get("/restaurant", protect, authorize("restaurant_owner","admin"), async 
         { $group: {
           _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
           orders: { $sum: 1 },
-          revenue: { $sum: "$total" },
+          revenue: { $sum: "$subtotal" },
         }},
         { $sort: { _id: 1 } },
       ]),

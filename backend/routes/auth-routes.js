@@ -7,6 +7,7 @@ const {
   forgotPassword, resetPassword, testEmail,
   getNotifications, markNotificationRead, markAllNotificationsRead,
   deleteNotification, deleteAllNotifications,
+  toggleDriverOnline,
 } = require("../controllers/authController");
 
 // Public
@@ -21,6 +22,7 @@ router.post("/test-email",           testEmail);    // dev only
 router.get("/me",              protect, getMe);
 router.put("/profile",         protect, updateProfile);
 router.put("/change-password", protect, changePassword);
+router.put("/driver/online",   protect, toggleDriverOnline);
 
 // Notifications — specific routes before :id wildcard
 router.get("/notifications",           protect, getNotifications);

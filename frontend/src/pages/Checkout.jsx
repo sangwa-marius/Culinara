@@ -55,6 +55,11 @@ export default function Checkout() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!restaurant?.isOpen) {
+      toast.error("This restaurant is currently closed. Please try again during opening hours.");
+      return;
+    }
+
     if (orderType === "delivery") {
       if (!address.street.trim() || !address.city.trim()) {
         toast.error("Please enter your delivery address");
