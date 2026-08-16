@@ -39,9 +39,7 @@ const TOP_ITEMS = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, exact: true },
 ];
 
-const BOTTOM_ITEMS = [
-  { to: "/", label: "Back to Home", icon: Home },
-];
+const BOTTOM_ITEMS = [];
 
 export default function RestaurantLayout() {
   const { user, logout }       = useAuth();

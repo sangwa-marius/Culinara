@@ -146,7 +146,7 @@ export default function App() {
 
   return (
     <GoogleOAuthProvider clientId={clientId}>
-    <BrowserRouter>
+    <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <ThemeProvider>
       <AuthProvider>
         <NotificationProvider>
@@ -200,12 +200,9 @@ export default function App() {
 
               {/* ── Driver portal — ONE parent route keeps DriverLayout mounted ── */}
               <Route path="/driver" element={<DriverPortal />}>
-                <Route index                  element={<DriverDashboard />} />
-                <Route path="available"       element={<DriverDashboard />} />
-                <Route path="active"          element={<DriverDashboard />} />
-                <Route path="history"         element={<DriverDashboard />} />
-                <Route path="notifications"   element={<Notifications />} />
-                <Route path="profile"         element={<Profile />} />
+                <Route path=":tab?" element={<DriverDashboard />} />
+                <Route path="notifications" element={<Notifications />} />
+                <Route path="profile" element={<Profile />} />
               </Route>
 
               {/* ── Admin portal — ONE parent route keeps AdminLayout mounted ── */}

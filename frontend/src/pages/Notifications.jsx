@@ -4,6 +4,7 @@ import { Bell, CheckCheck, Package, Megaphone, Settings, Trash2, RefreshCw, Bike
 import { useAuth } from "../context/AuthContext";
 import { useNotificationContext } from "../context/NotificationContext";
 import { orderAPI } from "../services/api";
+import OrderStatusBadge from "../components/OrderStatusBadge";
 import { formatDistanceToNow, format, isToday, isYesterday } from "date-fns";
 import clsx from "clsx";
 import toast from "react-hot-toast";
@@ -56,6 +57,7 @@ export default function NotificationsPage() {
   const navigate      = useNavigate();
   const [activeFilter, setActiveFilter] = useState("all");
   const [confirmClearAll, setConfirmClearAll] = useState(false);
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
   const [selectedNotif, setSelectedNotif] = useState(null);
   const [orderDetails, setOrderDetails] = useState(null);
   const [orderLoading, setOrderLoading] = useState(false);
@@ -98,24 +100,28 @@ export default function NotificationsPage() {
   };
 
   const handleClick = (notif) => {
-    if (notif.type === "delivery_request" && user?.role === "delivery_driver") {
+    const isDriverDeliveryNotif = user?.role === "delivery_driver" && (notif.type === "delivery_request" || notif.type === "order");
+    const isOwnerOrderNotif = user?.role === "restaurant_owner" && notif.orderId;
+    if (isDriverDeliveryNotif || isOwnerOrderNotif) {
       openDeliveryPopup(notif);
       return;
     }
     if (!notif.isRead) markOneRead(notif._id);
     if (notif.orderId) {
-      if (user?.role === "restaurant_owner") {
-        navigate("/dashboard/orders");
-      } else {
-        navigate(`/orders/${notif.orderId}`);
-      }
+      navigate(`/orders/${notif.orderId}`);
     }
   };
 
   const handleDeleteOne = (e, id) => {
     e.stopPropagation();
-    deleteOne(id);
+    setConfirmDeleteId(id);
+  };
+
+  const confirmDeleteOne = () => {
+    if (!confirmDeleteId) return;
+    deleteOne(confirmDeleteId);
     toast.success("Notification removed");
+    setConfirmDeleteId(null);
   };
 
   const handleMarkAllRead = async () => {
@@ -170,123 +176,260 @@ export default function NotificationsPage() {
         </div>
       )}
 
-      {/* Delivery Details Popup */}
-      {selectedNotif && (
+      {/* Confirm Delete One Dialog */}
+      {confirmDeleteId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setSelectedNotif(null)} />
-          <div className="relative bg-white dark:bg-stone-900 border border-cream-300 dark:border-stone-700 rounded-2xl shadow-2xl w-full max-w-md animate-slide-up max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white dark:bg-stone-900 border-b border-cream-300 dark:border-stone-800 px-5 py-4 flex items-center justify-between z-10 rounded-t-2xl">
-              <h3 className="font-bold text-stone-900 dark:text-white">Delivery Details</h3>
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setConfirmDeleteId(null)} />
+          <div className="relative bg-white dark:bg-stone-900 border border-cream-300 dark:border-stone-700 rounded-2xl shadow-2xl p-6 w-full max-w-sm animate-slide-up">
+            <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Trash2 size={22} className="text-red-500 dark:text-red-400" />
+            </div>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white text-center mb-1">
+              Delete notification?
+            </h3>
+            <p className="text-sm text-gray-400 dark:text-gray-500 text-center mb-6">
+              This action cannot be undone.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setConfirmDeleteId(null)}
+                className="flex-1 btn-secondary py-2.5"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDeleteOne}
+                className="flex-1 bg-red-500 hover:bg-red-600 text-white font-semibold py-2.5 px-4 rounded-xl transition-all flex items-center justify-center gap-2"
+              >
+                <Trash2 size={15} /> Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Order Details Popup */}
+      {selectedNotif && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setSelectedNotif(null)} />
+          <div className="relative w-full max-w-2xl max-h-[90vh] flex flex-col bg-white dark:bg-stone-900 border border-cream-300 dark:border-stone-700 rounded-2xl shadow-2xl animate-slide-up mx-4">
+            {/* Modal header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-cream-300 dark:border-stone-800 shrink-0">
+              <h3 className="font-bold text-stone-900 dark:text-white">Order Details</h3>
               <button onClick={() => setSelectedNotif(null)} className="p-1.5 rounded-lg text-stone-400 hover:text-stone-600 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors">
                 <X size={17} />
               </button>
             </div>
 
-            {orderLoading ? (
-              <div className="p-10 flex flex-col items-center gap-3">
-                <div className="w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full animate-spin" />
-                <p className="text-sm text-gray-400 dark:text-gray-500">Loading delivery details…</p>
-              </div>
-            ) : orderDetails ? (
-              <div className="p-5 space-y-4">
-                {/* Order header */}
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="font-bold text-stone-900 dark:text-white text-lg">#{orderDetails.orderNumber}</p>
-                    <p className="text-xs text-stone-400 mt-0.5">{orderDetails.items?.length || 0} items</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-black text-xl text-primary-500">${orderDetails.total?.toFixed(2)}</p>
-                    {orderDetails.deliveryFee && (
-                      <p className="text-xs text-green-600 dark:text-green-400 font-medium">+${orderDetails.deliveryFee.toFixed(2)} delivery fee</p>
-                    )}
-                  </div>
+            {/* Modal body — scrollable */}
+            <div className="flex-1 overflow-y-auto px-6 py-5">
+              {orderLoading ? (
+                <div className="flex flex-col items-center gap-3 py-10">
+                  <div className="w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full animate-spin" />
+                  <p className="text-sm text-gray-400 dark:text-gray-500">Loading order details…</p>
                 </div>
-
-                {/* Route */}
-                <div className="bg-cream-100 dark:bg-stone-800 rounded-xl p-4 space-y-3">
-                  <div className="flex gap-3">
-                    <div className="flex flex-col items-center gap-1 pt-1 shrink-0">
-                      <div className="w-3 h-3 rounded-full bg-primary-500 ring-4 ring-primary-100 dark:ring-primary-900/30" />
-                      <div className="w-0.5 flex-1 bg-cream-400 dark:bg-stone-600 min-h-[20px]" />
-                      <div className="w-3 h-3 rounded-full bg-green-500 ring-4 ring-green-100 dark:ring-green-900/30" />
-                    </div>
-                    <div className="flex-1 space-y-3">
-                      <div>
-                        <p className="text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-0.5">Pick Up</p>
-                        <p className="font-semibold text-stone-900 dark:text-white text-sm">{orderDetails.restaurant?.name || "Restaurant"}</p>
-                        {orderDetails.restaurant?.address && (
-                          <p className="text-xs text-stone-500">{orderDetails.restaurant.address.street}, {orderDetails.restaurant.address.city}</p>
-                        )}
-                        {orderDetails.restaurant?.phone && (
-                          <a href={`tel:${orderDetails.restaurant.phone}`} className="text-xs text-primary-500 hover:text-primary-600 flex items-center gap-1 mt-0.5">
-                            <Phone size={10} />{orderDetails.restaurant.phone}
-                          </a>
-                        )}
-                      </div>
-                      <div>
-                        <p className="text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-0.5">Drop Off</p>
-                        {orderDetails.deliveryAddress ? (
-                          <p className="font-semibold text-stone-900 dark:text-white text-sm">
-                            {[orderDetails.deliveryAddress.street, orderDetails.deliveryAddress.city].filter(Boolean).join(", ")}
-                          </p>
-                        ) : (
-                          <p className="text-sm text-stone-400 italic">Address on file</p>
-                        )}
-                        {orderDetails.customer?.phone && (
-                          <a href={`tel:${orderDetails.customer.phone}`} className="text-xs text-primary-500 hover:text-primary-600 flex items-center gap-1 mt-0.5">
-                            <Phone size={10} />{orderDetails.customer.phone}
-                          </a>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Items */}
-                {orderDetails.items?.length > 0 && (
-                  <div>
-                    <p className="text-xs font-bold text-stone-500 uppercase tracking-wider mb-2">Items</p>
-                    <div className="space-y-1.5">
-                      {orderDetails.items.slice(0, 4).map((item, i) => (
-                        <div key={i} className="flex justify-between text-sm">
-                          <span className="text-stone-600 dark:text-stone-300">{item.quantity}× {item.name}</span>
-                          <span className="text-stone-500 font-medium">${(item.price * item.quantity).toFixed(2)}</span>
+              ) : orderDetails ? (
+                <div className="space-y-5">
+                  {user?.role === "restaurant_owner" ? (
+                    <>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <h3 className="font-bold text-stone-900 dark:text-white text-lg">#{orderDetails.orderNumber}</h3>
+                          <OrderStatusBadge status={orderDetails.status} />
+                          <span className={clsx("badge text-[9px] sm:text-[10px]",
+                            orderDetails.orderType === "dine_in"
+                              ? "bg-blue-50 text-blue-600 dark:bg-blue-950/30 dark:text-blue-400"
+                              : "bg-green-50 text-green-600 dark:bg-green-950/30 dark:text-green-400")}>
+                            {orderDetails.orderType === "dine_in" ? "Dine-in" : "Delivery"}
+                          </span>
                         </div>
-                      ))}
-                      {orderDetails.items.length > 4 && (
-                        <p className="text-xs text-stone-400 italic">+{orderDetails.items.length - 4} more items</p>
-                      )}
-                    </div>
-                  </div>
-                )}
+                      </div>
 
-                {/* Actions */}
-                <div className="flex gap-3 pt-1">
-                  <button onClick={() => setSelectedNotif(null)} className="btn-secondary flex-1 py-2.5">Close</button>
-                  <button
-                    onClick={() => {
-                      setSelectedNotif(null);
-                      if (orderDetails?.status === "ready_for_pickup") navigate("/driver/available");
-                      else if (orderDetails?.status === "delivered") navigate("/driver/history");
-                      else navigate("/driver/active");
-                    }}
-                    className="btn-primary flex-1 py-2.5 gap-2"
-                  >
-                    <PackageOpen size={15} />{" "}
-                    {orderDetails?.status === "ready_for_pickup"
-                      ? "View in Available"
-                      : orderDetails?.status === "delivered"
-                        ? "View in History"
-                        : "View in My Deliveries"}
-                  </button>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="bg-cream-100 dark:bg-stone-800 rounded-xl p-3">
+                          <p className="text-[10px] font-semibold text-stone-400 uppercase tracking-wide mb-1">Customer</p>
+                          <p className="text-sm font-semibold text-stone-900 dark:text-white">{orderDetails.customer?.name}</p>
+                          <p className="text-xs text-stone-400">{orderDetails.customer?.email}</p>
+                        </div>
+                        <div className="bg-cream-100 dark:bg-stone-800 rounded-xl p-3">
+                          <p className="text-[10px] font-semibold text-stone-400 uppercase tracking-wide mb-1">Order Type</p>
+                          <p className="text-sm font-semibold text-stone-900 dark:text-white capitalize">{orderDetails.orderType?.replace(/_/g, " ")}</p>
+                          {orderDetails.tableNumber && <p className="text-xs text-stone-400">Table {orderDetails.tableNumber}</p>}
+                        </div>
+                      </div>
+
+                      {orderDetails.deliveryAddress && (
+                        <div className="bg-cream-100 dark:bg-stone-800 rounded-xl p-3">
+                          <p className="text-[10px] font-semibold text-stone-400 uppercase tracking-wide mb-1">Delivery Address</p>
+                          <p className="text-sm text-stone-900 dark:text-white">
+                            {typeof orderDetails.deliveryAddress === "string"
+                              ? orderDetails.deliveryAddress
+                              : [orderDetails.deliveryAddress.street, orderDetails.deliveryAddress.city, orderDetails.deliveryAddress.state, orderDetails.deliveryAddress.zipCode].filter(Boolean).join(", ") || "No address provided"}
+                          </p>
+                        </div>
+                      )}
+
+                      <div>
+                        <p className="text-[10px] font-semibold text-stone-400 uppercase tracking-wide mb-2">Items</p>
+                        <div className="space-y-2">
+                          {(orderDetails.items || []).map((item, idx) => (
+                            <div key={idx} className="flex items-center justify-between bg-cream-100 dark:bg-stone-800 rounded-xl px-4 py-3">
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-semibold text-stone-900 dark:text-white truncate">{item.name}</p>
+                                <p className="text-xs text-stone-400">Qty: {item.quantity} · ${(item.price * item.quantity).toFixed(2)}</p>
+                                {(item.customizations || []).length > 0 && (
+                                  <div className="flex flex-wrap gap-1 mt-1">
+                                    {item.customizations.map((c, ci) => (
+                                      <span key={ci} className="text-[10px] bg-cream-200 dark:bg-stone-700 text-stone-500 px-1.5 py-0.5 rounded-full">
+                                        +{c.name} {c.price > 0 ? `($${c.price})` : ""}
+                                      </span>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                              <span className="text-sm font-bold text-stone-900 dark:text-white ml-3">
+                                ${((item.price + (item.customizations || []).reduce((s, c) => s + (c.price || 0), 0)) * item.quantity).toFixed(2)}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="border-t border-cream-300 dark:border-stone-700 pt-3 space-y-1.5">
+                        <div className="flex justify-between text-xs text-stone-500">
+                          <span>Subtotal</span><span className="font-semibold">${orderDetails.subtotal?.toFixed(2)}</span>
+                        </div>
+                        {orderDetails.deliveryFee > 0 && (
+                          <div className="flex justify-between text-xs text-stone-500">
+                            <span>Delivery Fee</span><span className="font-semibold">${orderDetails.deliveryFee?.toFixed(2)}</span>
+                          </div>
+                        )}
+                        <div className="flex justify-between text-xs text-stone-500">
+                          <span>Tax</span><span className="font-semibold">${orderDetails.tax?.toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between text-sm font-bold text-stone-900 dark:text-white pt-1.5">
+                          <span>Total</span><span>${orderDetails.total?.toFixed(2)}</span>
+                        </div>
+                      </div>
+
+                      {orderDetails.notes && (
+                        <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800/30 rounded-xl p-3">
+                          <p className="text-[10px] font-semibold text-amber-600 uppercase tracking-wide mb-1">Notes</p>
+                          <p className="text-sm text-amber-800 dark:text-amber-300">{orderDetails.notes}</p>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <p className="font-bold text-stone-900 dark:text-white text-lg">#{orderDetails.orderNumber}</p>
+                          <p className="text-xs text-stone-400 mt-0.5">{orderDetails.items?.length || 0} items</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-black text-xl text-primary-500">${orderDetails.total?.toFixed(2)}</p>
+                          {orderDetails.deliveryFee && (
+                            <p className="text-xs text-green-600 dark:text-green-400 font-medium">+${orderDetails.deliveryFee.toFixed(2)} delivery fee</p>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="bg-cream-100 dark:bg-stone-800 rounded-xl p-4 space-y-3">
+                        <div className="flex gap-3">
+                          <div className="flex flex-col items-center gap-1 pt-1 shrink-0">
+                            <div className="w-3 h-3 rounded-full bg-primary-500 ring-4 ring-primary-100 dark:ring-primary-900/30" />
+                            <div className="w-0.5 flex-1 bg-cream-400 dark:bg-stone-600 min-h-[20px]" />
+                            <div className="w-3 h-3 rounded-full bg-green-500 ring-4 ring-green-100 dark:ring-green-900/30" />
+                          </div>
+                          <div className="flex-1 space-y-3">
+                            <div>
+                              <p className="text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-0.5">Pick Up</p>
+                              <p className="font-semibold text-stone-900 dark:text-white text-sm">{orderDetails.restaurant?.name || "Restaurant"}</p>
+                              {orderDetails.restaurant?.address && (
+                                <p className="text-xs text-stone-500">{orderDetails.restaurant.address.street}, {orderDetails.restaurant.address.city}</p>
+                              )}
+                              {orderDetails.restaurant?.phone && (
+                                <a href={`tel:${orderDetails.restaurant.phone}`} className="text-xs text-primary-500 hover:text-primary-600 flex items-center gap-1 mt-0.5">
+                                  <Phone size={10} />{orderDetails.restaurant.phone}
+                                </a>
+                              )}
+                            </div>
+                            <div>
+                              <p className="text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-0.5">Drop Off</p>
+                              {orderDetails.deliveryAddress ? (
+                                <p className="font-semibold text-stone-900 dark:text-white text-sm">
+                                  {[orderDetails.deliveryAddress.street, orderDetails.deliveryAddress.city].filter(Boolean).join(", ")}
+                                </p>
+                              ) : (
+                                <p className="text-sm text-stone-400 italic">Address on file</p>
+                              )}
+                              {orderDetails.customer?.phone && (
+                                <a href={`tel:${orderDetails.customer.phone}`} className="text-xs text-primary-500 hover:text-primary-600 flex items-center gap-1 mt-0.5">
+                                  <Phone size={10} />{orderDetails.customer.phone}
+                                </a>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div>
+                        <p className="text-xs font-bold text-stone-500 uppercase tracking-wider mb-2">Items</p>
+                        <div className="space-y-1.5">
+                          {orderDetails.items?.slice(0, 4).map((item, i) => (
+                            <div key={i} className="flex justify-between text-sm">
+                              <span className="text-stone-600 dark:text-stone-300">{item.quantity}× {item.name}</span>
+                              <span className="text-stone-500 font-medium">${(item.price * item.quantity).toFixed(2)}</span>
+                            </div>
+                          ))}
+                          {orderDetails.items?.length > 4 && (
+                            <p className="text-xs text-stone-400 italic">+{orderDetails.items.length - 4} more items</p>
+                          )}
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
-              </div>
-            ) : (
-              <div className="p-10 text-center">
-                <p className="text-sm text-stone-400">No details available</p>
-              </div>
-            )}
+              ) : (
+                <div className="py-10 text-center">
+                  <p className="text-sm text-stone-400">No details available</p>
+                </div>
+              )}
+            </div>
+
+            {/* Modal footer */}
+            <div className="flex gap-3 px-6 py-4 border-t border-cream-300 dark:border-stone-800 shrink-0">
+              <button onClick={() => setSelectedNotif(null)} className="btn-secondary flex-1">Close</button>
+              {user?.role === "delivery_driver" && (
+                <button
+                  onClick={() => {
+                    setSelectedNotif(null);
+                    if (orderDetails?.status === "ready_for_pickup") navigate("/driver/available");
+                    else if (orderDetails?.status === "delivered") navigate("/driver/history");
+                    else navigate("/driver/active");
+                  }}
+                  className="btn-primary flex-1 gap-2"
+                >
+                  <PackageOpen size={15} />{" "}
+                  {orderDetails?.status === "ready_for_pickup"
+                    ? "View in Available"
+                    : orderDetails?.status === "delivered"
+                      ? "View in History"
+                      : "View in My Deliveries"}
+                </button>
+              )}
+              {user?.role === "restaurant_owner" && (
+                <button
+                  onClick={() => {
+                    setSelectedNotif(null);
+                    navigate("/dashboard/orders");
+                  }}
+                  className="btn-primary flex-1 gap-2"
+                >
+                  View in Orders
+                </button>
+              )}
+            </div>
           </div>
         </div>
       )}

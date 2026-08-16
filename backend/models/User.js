@@ -26,12 +26,13 @@ const userSchema = new mongoose.Schema(
     avatar:          { type: String,  default: "" },
     addresses:       [addressSchema],
     isActive:        { type: Boolean, default: true },
+    isOnline:        { type: Boolean, default: false },
     isEmailVerified: { type: Boolean, default: false },
     fcmToken:        { type: String,  default: "" },
     notifications: [
       {
         message:   String,
-        type:      { type: String, enum: ["order","promo","system"], default: "order" },
+        type:      { type: String, enum: ["order","promo","system","delivery_request"], default: "order" },
         isRead:    { type: Boolean, default: false },
         orderId:   { type: String,  default: null },
         createdAt: { type: Date,    default: Date.now },

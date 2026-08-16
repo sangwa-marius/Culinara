@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { authAPI } from "../services/api";
-import { User, Mail, Phone, Lock, Save, Bike, Shield, MapPin } from "lucide-react";
-import ImageUploader from "../components/ImageUploader";
+import { User, Mail, Phone, Lock, Save, Bike, Shield } from "lucide-react";
+import AvatarCropper from "../components/AvatarCropper";
 import SafeAvatar from "../components/SafeImage";
 import toast from "react-hot-toast";
 import clsx from "clsx";
@@ -74,11 +74,8 @@ export default function Profile() {
                   </span>
                 )}
               </div>
-              <div className="mt-3 max-w-xs">
-                <ImageUploader
-                  label="Profile Photo"
-                  hint="Square · JPG, PNG, WebP · max 5 MB"
-                  aspect="square"
+              <div className="mt-3">
+                <AvatarCropper
                   value={form.avatar}
                   onChange={(url) => setForm(f => ({ ...f, avatar: url }))}
                 />

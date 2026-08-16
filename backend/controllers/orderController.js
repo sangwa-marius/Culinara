@@ -171,6 +171,7 @@ const getOrder = async (req, res) => {
     const isCustomer = order.customer._id.toString() === req.user.id;
     const isAdmin    = req.user.role === "admin";
     const isDriver   = order.driver && order.driver._id.toString() === req.user.id;
+    const isNotifiedDriver = req.user.role === "delivery_driver" && order.notifiedDrivers && order.notifiedDrivers.some(id => id.toString() === req.user.id);
 
     let ownerAuthorized = false;
     if (req.user.role === "restaurant_owner") {
@@ -178,7 +179,7 @@ const getOrder = async (req, res) => {
       ownerAuthorized = ownedRestaurant && ownedRestaurant._id.toString() === order.restaurant._id.toString();
     }
 
-    if (!isCustomer && !ownerAuthorized && !isDriver && !isAdmin) {
+    if (!isCustomer && !ownerAuthorized && !isDriver && !isAdmin && !isNotifiedDriver) {
       return res.status(403).json({ success: false, message: "Not authorized" });
     }
 
@@ -244,7 +245,7 @@ const getRestaurantOrders = async (req, res) => {
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(Number(limit))
-        .populate("customer", "name phone")
+        .populate("customer", "name phone avatar")
         .populate("driver",   "name phone")
         .lean(),
     ]);

@@ -9,6 +9,37 @@ import SafeAvatar from "../../components/SafeImage";
 import { format } from "date-fns";
 import clsx from "clsx";
 
+const DAYS = ["sunday","monday","tuesday","wednesday","thursday","friday","saturday"];
+
+function isEffectivelyOpen(restaurant, now) {
+  if (!restaurant) return false;
+  if (restaurant.isOpen === false) return false;
+  const hours = restaurant.openingHours || {};
+  const today = DAYS[now.getDay()];
+  const todayHours = hours[today];
+  if (!todayHours || todayHours.isClosed) return false;
+  const [openH, openM] = (todayHours.open || "00:00").split(":").map(Number);
+  const [closeH, closeM] = (todayHours.close || "23:59").split(":").map(Number);
+  const current = now.getHours() * 60 + now.getMinutes();
+  const open = openH * 60 + openM;
+  const close = closeH * 60 + closeM;
+  return current >= open && current < close;
+}
+
+function canManuallyToggle(restaurant, now) {
+  if (!restaurant) return false;
+  const hours = restaurant.openingHours || {};
+  const today = DAYS[now.getDay()];
+  const todayHours = hours[today];
+  if (!todayHours || todayHours.isClosed) return false;
+  const [openH, openM] = (todayHours.open || "00:00").split(":").map(Number);
+  const [closeH, closeM] = (todayHours.close || "23:59").split(":").map(Number);
+  const current = now.getHours() * 60 + now.getMinutes();
+  const open = openH * 60 + openM;
+  const close = closeH * 60 + closeM;
+  return current >= open && current < close;
+}
+
 export default function RestaurantDashboard() {
   const { user }  = useAuth();
   const navigate  = useNavigate();
@@ -17,6 +48,7 @@ export default function RestaurantDashboard() {
   const [analytics, setAnalytics]   = useState(null);
   const [loading,    setLoading]    = useState(true);
   const [toggling,   setToggling]   = useState(false);
+  const [now, setNow] = useState(new Date());
 
   const toggleOpen = async () => {
     if (!restaurant || toggling) return;
@@ -50,6 +82,11 @@ export default function RestaurantDashboard() {
         await fetchOrders(rid);
       } finally { setLoading(false); }
     })();
+  }, []);
+
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 60_000);
+    return () => clearInterval(id);
   }, []);
 
   const fetchOrders = async (rid) => {
@@ -96,9 +133,26 @@ export default function RestaurantDashboard() {
 
   return (
     <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
-      <div>
-        <h1 className="text-xl sm:text-2xl font-bold text-stone-900 dark:text-white">Dashboard</h1>
-        <p className="text-xs sm:text-sm text-stone-400 mt-0.5">Welcome back! Here&apos;s what&apos;s happening today.</p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h1 className="text-xl sm:text-2xl font-bold text-stone-900 dark:text-white">Dashboard</h1>
+          <p className="text-xs sm:text-sm text-stone-400 mt-0.5">Welcome back! Here&apos;s what&apos;s happening today.</p>
+        </div>
+        {restaurant && (
+          <div className="flex items-center gap-3">
+            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold ${isEffectivelyOpen(restaurant, now) ? "bg-green-50 dark:bg-green-950/30 text-green-600 dark:text-green-400" : "bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400"}`}>
+              <Power size={14} />
+              <span className="hidden sm:inline">{isEffectivelyOpen(restaurant, now) ? "Open" : "Closed"}</span>
+              <button
+                onClick={toggleOpen}
+                disabled={toggling || !canManuallyToggle(restaurant, now)}
+                className={clsx("relative w-8 h-5 rounded-full transition-colors", restaurant.isOpen ? "bg-green-500" : "bg-stone-300", toggling && "opacity-70")}
+              >
+                <span className={clsx("absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform", restaurant.isOpen ? "translate-x-3" : "translate-x-0")} />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
@@ -122,30 +176,6 @@ export default function RestaurantDashboard() {
           </div>
         ))}
       </div>
-
-      {/* Open/Close toggle */}
-      {restaurant && (
-        <div className="card p-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${restaurant.isOpen ? "bg-green-50 dark:bg-green-950/30 text-green-600" : "bg-red-50 dark:bg-red-950/30 text-red-600"}`}>
-              <Power size={20} />
-            </div>
-            <div>
-              <p className="font-bold text-stone-900 dark:text-white text-sm">Restaurant Status</p>
-              <p className={`text-xs font-medium ${restaurant.isOpen ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}>
-                {restaurant.isOpen ? "Currently Open" : "Currently Closed"}
-              </p>
-            </div>
-          </div>
-          <button
-            onClick={toggleOpen}
-            disabled={toggling}
-            className={clsx("relative w-12 h-7 rounded-full transition-colors", restaurant.isOpen ? "bg-green-500" : "bg-stone-300", toggling && "opacity-70")}
-          >
-            <span className={clsx("absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow transition-transform", restaurant.isOpen ? "translate-x-5" : "translate-x-0")} />
-          </button>
-        </div>
-      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-5">
         <div className="lg:col-span-2 card overflow-hidden">

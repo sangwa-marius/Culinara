@@ -9,7 +9,7 @@ const User  = require("../models/User");
 router.get("/list", protect, authorize("restaurant_owner", "admin"), async (req, res) => {
   try {
     const drivers = await User.find({ role: "delivery_driver", isActive: true })
-      .select("name phone avatar")
+      .select("name phone avatar isOnline")
       .sort({ name: 1 });
     res.json({ success: true, drivers });
   } catch (error) {
@@ -28,7 +28,7 @@ router.post("/notify/:orderId", protect, authorize("restaurant_owner", "admin"),
       Order.findById(req.params.orderId)
         .populate("restaurant", "name address")
         .populate("customer", "name"),
-      User.findById(driverId).select("name phone notifications"),
+      User.findById(driverId).select("name phone notifications isOnline"),
     ]);
 
     if (!order) return res.status(404).json({ success: false, message: "Order not found" });
@@ -37,7 +37,24 @@ router.post("/notify/:orderId", protect, authorize("restaurant_owner", "admin"),
       return res.status(400).json({ success: false, message: "Order is not ready for pickup yet" });
     }
 
-    // Add driver to notifiedDrivers if not already there
+    // Check if driver is online using DB field first, then socket room as secondary check
+    const { getIO } = require("../utils/socket");
+    let io;
+    try { io = getIO(); } catch {}
+    let socketOnline = false;
+    if (io) {
+      try {
+        const sockets = io.sockets.adapter.rooms.get(`user_${driverId}`);
+        socketOnline = !!(sockets && sockets.size > 0);
+      } catch {}
+    }
+    const isOnline = driver.isOnline && socketOnline;
+
+    if (!isOnline) {
+      return res.status(400).json({ success: false, message: `Driver is currently offline (${driver.name}). Please try again when they are online.` });
+    }
+
+    // Add driver to notifiedDrivers only after confirming they're online
     if (!order.notifiedDrivers.map(String).includes(String(driverId))) {
       order.notifiedDrivers.push(driverId);
       await order.save();
@@ -47,7 +64,7 @@ router.post("/notify/:orderId", protect, authorize("restaurant_owner", "admin"),
     const notifMessage = `📦 Delivery request: Order #${order.orderNumber} from ${order.restaurant?.name} — $${order.deliveryFee?.toFixed(2)} delivery fee`;
     driver.notifications.push({
       message: notifMessage,
-      type: "order",
+      type: "delivery_request",
       isRead: false,
       orderId: order._id,
     });
@@ -90,6 +107,64 @@ router.get("/available", protect, authorize("delivery_driver", "admin"), async (
       .populate("restaurant", "name address phone logo")
       .populate("customer", "name phone");
     res.json({ success: true, orders });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// @desc  Driver declines an available order with a reason
+// @route POST /api/driver/decline/:orderId
+router.post("/decline/:orderId", protect, authorize("delivery_driver", "admin"), async (req, res) => {
+  try {
+    const { reason } = req.body;
+    if (!reason || !reason.trim()) {
+      return res.status(400).json({ success: false, message: "Please provide a reason for declining" });
+    }
+
+    const order = await Order.findById(req.params.orderId)
+      .populate("restaurant", "name owner");
+    if (!order) return res.status(404).json({ success: false, message: "Order not found" });
+    if (order.status !== "ready_for_pickup") {
+      return res.status(400).json({ success: false, message: "Order is no longer available" });
+    }
+    if (order.driver) {
+      return res.status(400).json({ success: false, message: "Order already taken by another driver" });
+    }
+
+    // Remove this driver from notifiedDrivers so the order disappears from their Available list
+    // and so the owner can re-notify this same driver later if desired
+    order.notifiedDrivers = order.notifiedDrivers.filter(id => String(id) !== String(req.user._id));
+
+    order.statusHistory.push({
+      status: "ready_for_pickup",
+      message: `Driver declined: ${reason.trim()}`,
+      updatedBy: req.user.id,
+    });
+    await order.save();
+
+    const { emitOrderUpdate, emitNotification } = require("../utils/socket");
+    emitOrderUpdate(order, `Driver declined delivery: ${reason.trim()}`);
+
+    // Notify restaurant owner
+    if (order.restaurant?.owner) {
+      const ownerId = order.restaurant.owner.toString();
+      const ownerNotif = {
+        type: "order",
+        message: `Driver declined order #${order.orderNumber}: ${reason.trim()}`,
+        orderId: order._id,
+        restaurantId: order.restaurant._id,
+        customerName: order.customer?.name || "A customer",
+        total: order.total,
+        orderType: order.orderType,
+        tableNumber: order.tableNumber,
+      };
+      emitNotification(ownerId, ownerNotif);
+      await User.findByIdAndUpdate(ownerId, {
+        $push: { notifications: { ...ownerNotif, read: false, createdAt: new Date() } },
+      }).catch(() => {});
+    }
+
+    res.json({ success: true, message: "Order declined successfully" });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

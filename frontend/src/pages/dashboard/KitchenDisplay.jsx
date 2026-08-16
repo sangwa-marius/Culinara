@@ -13,10 +13,14 @@ function ElapsedTimer({ createdAt }) {
     const id = setInterval(tick, 1000);
     return () => clearInterval(id);
   }, [createdAt]);
-  const m = Math.floor(elapsed / 60), s = elapsed % 60;
+  const h = Math.floor(elapsed / 3600);
+  const m = Math.floor((elapsed % 3600) / 60);
+  const s = elapsed % 60;
+  const isLong = elapsed >= 3600;
+  const isWarning = m >= 20 && !isLong;
   return (
-    <span className={clsx("font-mono text-[10px] sm:text-sm font-bold", m >= 20 ? "text-red-500" : "text-stone-600 dark:text-stone-300")}>
-      {String(m).padStart(2, "0")}:{String(s).padStart(2, "0")}
+    <span className={clsx("font-mono text-[10px] sm:text-sm font-bold", isLong || isWarning ? "text-red-500" : "text-stone-600 dark:text-stone-300")}>
+      {isLong ? `${String(h).padStart(2, "0")}:` : ""}{String(m).padStart(2, "0")}:{String(s).padStart(2, "0")}
     </span>
   );
 }
