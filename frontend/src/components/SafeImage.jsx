@@ -42,10 +42,17 @@ function normalizeImageUrl(src) {
  *   imgClass  — applied only to <img>
  *   style     — inline style for the wrapper div (fallback only)
  */
-export default function SafeImage({ src, alt = "", fallback, className = "", imgClass = "", style }) {
+export default function SafeImage({
+  src,
+  alt = "",
+  fallback,
+  className = "",
+  imgClass = "",
+  style,
+}) {
   const [failed, setFailed] = useState(false);
 
-  const resolved    = normalizeImageUrl(src);
+  const resolved = normalizeImageUrl(src);
   const showFallback = !resolved || failed;
 
   if (showFallback) {
@@ -74,14 +81,21 @@ export default function SafeImage({ src, alt = "", fallback, className = "", img
 /**
  * SafeAvatar — circular avatar with letter-initial fallback.
  */
-export function SafeAvatar({ src, name = "", size = "w-12 h-12", textSize = "text-lg" }) {
+export function SafeAvatar({
+  src,
+  name = "",
+  size = "w-12 h-12",
+  textSize = "text-lg",
+}) {
   const [failed, setFailed] = useState(false);
   const resolved = normalizeImageUrl(src);
-  const letter   = name.charAt(0).toUpperCase() || "?";
+  const letter = name.charAt(0).toUpperCase() || "?";
 
   if (!resolved || failed) {
     return (
-      <div className={`${size} rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center font-bold text-white ${textSize} shrink-0`}>
+      <div
+        className={`${size} rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center font-bold text-white ${textSize} shrink-0`}
+      >
         {letter}
       </div>
     );
