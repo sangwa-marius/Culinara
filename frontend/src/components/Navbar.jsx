@@ -97,20 +97,12 @@ export default function Navbar() {
       >
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 group">
-          <Logo className="h-7 w-auto transition-transform duration-300 group-hover:scale-110" />
-          <span
-            className={clsx(
-              "font-display font-bold text-xl tracking-tight transition-colors",
-              isLoggedOut
-                ? "text-stone-900 dark:text-white"
-                : transparent
-                  ? "text-white"
-                  : "text-stone-900 dark:text-white",
-            )}
-          >
+          <Logo className="h-7 w-auto transition-transform duration-300 group-hover:scale-110 dark:text-white" iconOnly/>
+          <span className="dark:text-white text-md font-medium">
             Culinara
           </span>
-        </Link>
+          </Link>
+          
 
         {/* Desktop nav */}
         {user && (
