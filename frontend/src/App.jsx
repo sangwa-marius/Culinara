@@ -57,6 +57,7 @@ const AdminOverview       = lazy(() => import("./pages/admin/AdminOverview"));
 const AdminRestaurants    = lazy(() => import("./pages/admin/AdminRestaurants"));
 const AdminUsers          = lazy(() => import("./pages/admin/AdminUsers"));
 const AdminNotifications  = lazy(() => import("./pages/admin/AdminNotifications"));
+const AdminSubscriptions  = lazy(() => import("./pages/admin/AdminSubscriptions"));
 
 // ── Loaders & wrappers ────────────────────────────────────────────────────────
 function RoleRedirect() {
@@ -72,7 +73,7 @@ function RoleRedirect() {
     if (user.role === "restaurant_owner") navigate("/dashboard", { replace: true });
     else if (user.role === "delivery_driver") navigate("/driver", { replace: true });
     else if (user.role === "admin") navigate("/admin", { replace: true });
-    else navigate("/restaurants", { replace: true });
+    else navigate("/overview", { replace: true });
   }, [user, loading, navigate, location.pathname]);
 
   if (loading) return <PageLoader />;
@@ -211,8 +212,8 @@ export default function App() {
                 <Route path="restaurants"     element={<AdminRestaurants />} />
                 <Route path="users"           element={<AdminUsers />} />
                 <Route path="notifications"   element={<AdminNotifications />} />
-                <Route path="subscriptions"   element={<AdminOverview />} />
-                <Route path="settings"        element={<AdminOverview />} />
+                <Route path="subscriptions"   element={<AdminSubscriptions />} />
+                <Route path="profile"         element={<Profile />} />
               </Route>
 
               {/* ── 404 ── */}

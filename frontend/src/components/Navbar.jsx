@@ -21,6 +21,7 @@ import { useTheme } from "../context/ThemeContext";
 import { useNotificationContext } from "../context/NotificationContext";
 import { formatDistanceToNow } from "date-fns";
 import SafeAvatar from "./SafeImage";
+import ConfirmDialog from "./ConfirmDialog";
 import clsx from "clsx";
 
 export default function Navbar() {
@@ -33,6 +34,7 @@ export default function Navbar() {
   const [dropOpen, setDropOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [logoutConfirm, setLogoutConfirm] = useState(false);
   const dropRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
@@ -62,8 +64,7 @@ export default function Navbar() {
   }, [location.pathname]);
 
   const handleLogout = () => {
-    logout();
-    navigate("/");
+    setLogoutConfirm(true);
   };
   const getDashLink = () => {
     if (user?.role === "restaurant_owner") return "/dashboard";
@@ -76,16 +77,17 @@ export default function Navbar() {
   const transparent = isHome && !scrolled;
 
   return (
-    <nav
-      className={clsx(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-        isLoggedOut
-          ? "bg-white dark:bg-stone-900 backdrop-blur-xl border-b border-white/30 dark:border-stone-700/30"
-          : transparent
-            ? "bg-transparent"
-            : "bg-white/95 dark:bg-stone-950/95 backdrop-blur-xl border-b border-cream-300 dark:border-stone-800 shadow-sm",
-      )}
-    >
+    <>
+      <nav
+        className={clsx(
+          "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
+          isLoggedOut
+            ? "bg-white dark:bg-stone-900 backdrop-blur-xl border-b border-white/30 dark:border-stone-700/30"
+            : transparent
+              ? "bg-transparent"
+              : "bg-white/95 dark:bg-stone-950/95 backdrop-blur-xl border-b border-cream-300 dark:border-stone-800 shadow-sm",
+        )}
+      >
       <div
         className={clsx(
           "mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between",
@@ -496,5 +498,16 @@ export default function Navbar() {
         </div>
       )}
     </nav>
+
+    <ConfirmDialog
+      open={logoutConfirm}
+      title="Sign out?"
+      message="You will need to log in again to access your account."
+      confirmLabel="Sign Out"
+      variant="danger"
+      onConfirm={() => { setLogoutConfirm(false); logout(); navigate("/"); }}
+      onCancel={() => setLogoutConfirm(false)}
+    />
+    </>
   );
 }

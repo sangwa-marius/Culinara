@@ -9,6 +9,7 @@ import {
   LogOut, ChevronDown, User, Menu, X,
 } from "lucide-react";
 import SafeAvatar from "./SafeImage";
+import ConfirmDialog from "./ConfirmDialog";
 import clsx from "clsx";
 
 const GROUPS = [
@@ -49,6 +50,7 @@ export default function RestaurantLayout() {
   const navigate  = useNavigate();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen]   = useState(false);
+  const [logoutConfirm, setLogoutConfirm] = useState(false);
   const [openGroups, setOpenGroups] = useState({ operations: true, account: false });
   const menuRef = useRef(null);
   const sidebarRef = useRef(null);
@@ -71,7 +73,7 @@ export default function RestaurantLayout() {
     exact ? location.pathname === to : location.pathname.startsWith(to);
 
   const toggleGroup = (id) => setOpenGroups(prev => ({ ...prev, [id]: !prev[id] }));
-  const handleLogout = () => { logout(); navigate("/"); };
+  const handleLogout = () => setLogoutConfirm(true);
 
   const pageLabel = () => {
     const p = location.pathname;
@@ -229,6 +231,15 @@ export default function RestaurantLayout() {
         </header>
         <main className="flex-1 overflow-y-auto"><Outlet /></main>
       </div>
+      <ConfirmDialog
+        open={logoutConfirm}
+        title="Sign out?"
+        message="You will need to log in again to access your restaurant account."
+        confirmLabel="Sign Out"
+        variant="danger"
+        onConfirm={() => { setLogoutConfirm(false); logout(); navigate("/"); }}
+        onCancel={() => setLogoutConfirm(false)}
+      />
     </div>
   );
 }

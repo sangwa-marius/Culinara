@@ -23,7 +23,7 @@ export default function Login() {
     if (u.role === "restaurant_owner") navigate("/dashboard");
     else if (u.role === "admin") navigate("/admin");
     else if (u.role === "delivery_driver") navigate("/driver");
-    else navigate(from);
+    else navigate("/overview");
   };
 
   const handleGoogle = async (res) => {

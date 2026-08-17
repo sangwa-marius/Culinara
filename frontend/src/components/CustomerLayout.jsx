@@ -20,6 +20,7 @@ import {
   ChefHat,
 } from "lucide-react";
 import SafeAvatar from "./SafeImage";
+import ConfirmDialog from "./ConfirmDialog";
 import clsx from "clsx";
 
 const NAV = [
@@ -78,6 +79,7 @@ export default function CustomerLayout() {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [logoutConfirm, setLogoutConfirm] = useState(false);
   const [openGroups, setOpenGroups] = useState({
     overview: true,
     account: true,
@@ -247,10 +249,7 @@ export default function CustomerLayout() {
           <div className="mt-1 bg-white dark:bg-stone-900 border border-cream-300 dark:border-stone-700 rounded-xl shadow-lg overflow-hidden animate-slide-up">
             <div className="border-t border-cream-200 dark:border-stone-700" />
             <button
-              onClick={() => {
-                logout();
-                navigate("/");
-              }}
+              onClick={() => setLogoutConfirm(true)}
               className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors"
             >
               <LogOut size={13} /> Sign Out
@@ -341,6 +340,15 @@ export default function CustomerLayout() {
           <Outlet />
         </main>
       </div>
+      <ConfirmDialog
+        open={logoutConfirm}
+        title="Sign out?"
+        message="You will need to log in again to access your account."
+        confirmLabel="Sign Out"
+        variant="danger"
+        onConfirm={() => { setLogoutConfirm(false); logout(); navigate("/"); }}
+        onCancel={() => setLogoutConfirm(false)}
+      />
     </div>
   );
 }
