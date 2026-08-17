@@ -25,4 +25,5 @@ restaurantSchema.index({ owner: 1 });
 restaurantSchema.index({ cuisine: 1 });
 restaurantSchema.index({ rating: -1 });
 restaurantSchema.index({ isApproved: 1, isActive: 1 });
+restaurantSchema.index({ name: "text", description: "text", cuisine: "text" });
 module.exports = mongoose.model("Restaurant", restaurantSchema);

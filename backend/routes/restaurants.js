@@ -10,7 +10,7 @@ router.get("/", async (req, res) => {
     const query = { isApproved: true, isActive: true };
     if (search) query.$or = [{ name: { $regex: search, $options: "i" } }, { cuisine: { $regex: search, $options: "i" } }, { description: { $regex: search, $options: "i" } }];
     if (cuisine) query.cuisine = { $in: cuisine.split(",").map(c => new RegExp(c.trim(), "i")) };
-    if (isOpen === "true") query.isOpen = true;
+    if (isOpen === true || isOpen === "true") query.isOpen = true;
     const sortMap = { rating: { rating: -1 }, deliveryFee: { deliveryFee: 1 }, newest: { createdAt: -1 } };
     const skip = (Number(page) - 1) * Number(limit);
     const [total, restaurants] = await Promise.all([

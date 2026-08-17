@@ -17,8 +17,8 @@ const getRestaurants = async (req, res) => {
       query.cuisine = { $in: cuisine.split(",") };
     }
 
-    if (isOpen !== undefined) {
-      query.isOpen = isOpen === "true";
+    if (isOpen === true || isOpen === "true") {
+      query.isOpen = true;
     }
 
     let sortQuery = {};
