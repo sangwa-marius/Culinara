@@ -65,13 +65,13 @@ export default function RestaurantCard({ restaurant }) {
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
         <div
           className={clsx(
-            "absolute top-2.5 right-2.5 px-2 py-0.5 rounded-full text-xs font-semibold backdrop-blur-sm",
+            "absolute top-2.5 right-2.5 px-2 py-2 rounded-full text-xs font-semibold backdrop-blur-sm",
             effectiveOpen
               ? "bg-green-500/90 text-white"
               : "bg-stone-900/80 text-stone-300",
           )}
         >
-          {effectiveOpen ? "● Open" : "● Closed"}
+          {effectiveOpen ? "● Open" : "🔴 Closed"}
         </div>
         <div className="absolute -bottom-4 left-3.5 w-10 h-10 rounded-lg bg-white dark:bg-stone-900 shadow-md border border-cream-300 dark:border-stone-700 overflow-hidden">
           <SafeImage

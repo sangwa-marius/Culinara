@@ -1,12 +1,19 @@
 import { useState, useEffect } from "react";
-import { Clock } from "lucide-react";
+import { Clock, Users, Store, Package, DollarSign } from "lucide-react";
 import { adminAPI } from "../../services/api";
 import OrderStatusBadge from "../../components/OrderStatusBadge";
-import { StatCardSkeleton, CardSkeleton, OrderRowSkeleton } from "../../components/Skeleton";
+import { StatCardSkeleton, CardSkeleton, OrderRowSkeleton, Skeleton } from "../../components/Skeleton";
 import toast from "react-hot-toast";
 import clsx from "clsx";
 
 const THIRTY_MIN = 30 * 60 * 1000;
+
+const STATS = [
+  { key: "totalUsers",       label: "Total Users",         icon: Users,      color: "text-blue-600 bg-blue-50 dark:bg-blue-950/30" },
+  { key: "totalRestaurants", label: "Partner Restaurants", icon: Store,      color: "text-green-600 bg-green-50 dark:bg-green-950/30" },
+  { key: "totalOrders",      label: "Total Orders",        icon: Package,    color: "text-amber-600 bg-amber-50 dark:bg-amber-950/30" },
+  { key: "revenue",          label: "Revenue",             icon: DollarSign, color: "text-purple-600 bg-purple-50 dark:bg-purple-950/30", format: (v) => `$${(v || 0).toFixed(0)}` },
+];
 
 export default function AdminOverview() {
   const [stats,         setStats]         = useState(null);
@@ -51,19 +58,19 @@ export default function AdminOverview() {
     <div className="p-6 space-y-6">
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {[
-          { label: "Total Users",        value: stats?.totalUsers        ?? 0, icon: "👥", trend: "+12%" },
-          { label: "Partner Restaurants",value: stats?.totalRestaurants  ?? 0, icon: "🏪", trend: "+5%" },
-          { label: "Total Orders",       value: stats?.totalOrders       ?? 0, icon: "📦", trend: "+18%" },
-          { label: "Revenue",            value: `$${(stats?.revenue ?? 0).toFixed(0)}`, icon: "💰", trend: "+22%" },
-        ].map(s => (
-          <div key={s.label} className="card p-4">
-            <div className="flex items-start justify-between mb-2">
-              <span className="text-2xl">{s.icon}</span>
-              <span className="text-xs font-bold text-green-600 bg-green-50 dark:bg-green-950/30 px-1.5 py-0.5 rounded">{s.trend}</span>
+        {STATS.map(s => (
+          <div key={s.key} className="card p-4">
+            <div className="flex items-center gap-3">
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${s.color}`}>
+                <s.icon size={20} />
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs text-stone-400">{s.label}</p>
+                <p className="font-bold text-stone-900 dark:text-white text-lg mt-0.5">
+                  {s.format ? s.format(stats?.[s.key]) : (stats?.[s.key] ?? 0)}
+                </p>
+              </div>
             </div>
-            <p className="text-xs text-stone-400">{s.label}</p>
-            <p className="font-bold text-stone-900 dark:text-white text-xl mt-0.5">{s.value}</p>
           </div>
         ))}
       </div>

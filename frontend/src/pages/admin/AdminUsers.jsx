@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Search, Users, RefreshCw, ShieldOff, ShieldCheck } from "lucide-react";
+import { Search, Users, RefreshCw, ShieldOff, ShieldCheck, User, Truck, Store } from "lucide-react";
 import { adminAPI } from "../../services/api";
 import ConfirmDialog from "../../components/ConfirmDialog";
 import { CardSkeleton, Skeleton } from "../../components/Skeleton";
@@ -108,6 +108,28 @@ export default function AdminUsers() {
         <button onClick={fetchUsers} className="btn-secondary flex items-center gap-2 text-sm">
           <RefreshCw size={14} /> Refresh
         </button>
+      </div>
+
+      {/* Role stats */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+         {[
+           { label: "Customers", count: roleCounts.customer || 0, color: "text-stone-600 dark:text-stone-300", icon: User },
+           { label: "Owners", count: roleCounts.restaurant_owner || 0, color: "text-blue-600", icon: Store },
+           { label: "Drivers", count: roleCounts.delivery_driver || 0, color: "text-green-600", icon: Truck },
+           { label: "Admins", count: roleCounts.admin || 0, color: "text-purple-600", icon: ShieldCheck },
+         ].map(stat => (
+          <div key={stat.label} className="card p-3">
+            <div className="flex items-center gap-2">
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${stat.color} bg-current/10`}>
+                <stat.icon size={16} />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[10px] font-semibold text-stone-400 uppercase tracking-wide">{stat.label}</p>
+                <p className={`text-xl font-bold mt-0.5 ${stat.color}`}>{stat.count}</p>
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
 
       {/* Role filter pills */}

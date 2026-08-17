@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Search, CheckCircle, XCircle, Store, RefreshCw } from "lucide-react";
+import { Search, CheckCircle, XCircle, Store, RefreshCw, Clock } from "lucide-react";
 import { restaurantAPI } from "../../services/api";
 import ConfirmDialog from "../../components/ConfirmDialog";
 import { RestaurantCardSkeleton, StatCardSkeleton, Skeleton } from "../../components/Skeleton";
@@ -85,6 +85,27 @@ export default function AdminRestaurants() {
         </button>
       </div>
 
+      {/* Stats */}
+      <div className="grid grid-cols-3 gap-3">
+        {[
+          { label: "Total", value: restaurants.length, color: "text-stone-700 dark:text-stone-200", icon: Store },
+          { label: "Pending", value: pending, color: "text-amber-600 dark:text-amber-400", icon: Clock },
+          { label: "Approved", value: approved, color: "text-green-600 dark:text-green-400", icon: CheckCircle },
+        ].map(stat => (
+          <div key={stat.label} className="card p-3">
+            <div className="flex items-center gap-2">
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${stat.color} bg-current/10`}>
+                <stat.icon size={16} />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[10px] font-semibold text-stone-400 uppercase tracking-wide">{stat.label}</p>
+                <p className={`text-xl font-bold mt-0.5 ${stat.color}`}>{stat.value}</p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
       {/* Stats pills */}
       <div className="flex gap-2">
         {[
@@ -127,10 +148,10 @@ export default function AdminRestaurants() {
               <p className="text-stone-400 text-sm">No restaurants match your filter</p>
             </div>
           ) : filtered.map(r => (
-            <div key={r._id} className="px-5 py-4 hover:bg-cream-50 dark:hover:bg-stone-800/40 transition-colors">
-              <div className="flex items-center justify-between gap-4 flex-wrap">
-                {/* Restaurant info */}
-                <div className="flex items-center gap-3 flex-1 min-w-0">
+            <div key={r._id} className="px-5 py-4">
+              <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr_120px_120px_140px] gap-4 items-center">
+                {/* Restaurant */}
+                <div className="flex items-center gap-3 min-w-0">
                   <div className="w-10 h-10 bg-cream-200 dark:bg-stone-800 rounded-xl overflow-hidden shrink-0 flex items-center justify-center">
                     {r.logo
                       ? <img src={r.logo} alt={r.name} className="w-full h-full object-cover" />
@@ -146,13 +167,13 @@ export default function AdminRestaurants() {
                 </div>
 
                 {/* Owner */}
-                <div className="hidden md:block min-w-0 w-40">
+                <div className="min-w-0">
                   <p className="text-sm text-stone-700 dark:text-stone-300 truncate">{r.owner?.name || "—"}</p>
                   <p className="text-xs text-stone-400 truncate">{r.owner?.email || "—"}</p>
                 </div>
 
                 {/* Subscription */}
-                <div className="hidden md:block w-24">
+                <div>
                   <span className={`badge capitalize ${
                     r.subscription === "enterprise" ? "bg-purple-100 text-purple-700 dark:bg-purple-950/30 dark:text-purple-400" :
                     r.subscription === "pro"        ? "bg-blue-100 text-blue-700 dark:bg-blue-950/30 dark:text-blue-400" :
@@ -160,11 +181,15 @@ export default function AdminRestaurants() {
                   }`}>{r.subscription || "basic"}</span>
                 </div>
 
-                {/* Status + actions */}
-                <div className="flex items-center gap-2 shrink-0">
+                {/* Status */}
+                <div>
                   <span className={`badge ${r.isApproved ? "bg-green-50 text-green-700 dark:bg-green-950/30 dark:text-green-400" : "bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400"}`}>
                     {r.isApproved ? "Approved" : "Pending"}
                   </span>
+                </div>
+
+                {/* Actions */}
+                <div className="flex items-center gap-2">
                   {!r.isApproved ? (
                     <button
                       onClick={() => setConfirm({ id: r._id, approve: true, name: r.name })}
