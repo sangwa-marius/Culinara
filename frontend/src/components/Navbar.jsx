@@ -22,6 +22,7 @@ import { useNotificationContext } from "../context/NotificationContext";
 import { formatDistanceToNow } from "date-fns";
 import SafeAvatar from "./SafeImage";
 import ConfirmDialog from "./ConfirmDialog";
+import Logo from "./Logo";
 import clsx from "clsx";
 
 export default function Navbar() {
@@ -96,9 +97,7 @@ export default function Navbar() {
       >
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 group">
-          <span className="text-xl transition-transform duration-300 group-hover:scale-110">
-            🍽️
-          </span>
+          <Logo className="h-7 w-auto transition-transform duration-300 group-hover:scale-110" />
           <span
             className={clsx(
               "font-display font-bold text-xl tracking-tight transition-colors",

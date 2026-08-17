@@ -17,10 +17,10 @@ import {
   LogOut,
   ChevronDown,
   Menu,
-  ChefHat,
 } from "lucide-react";
 import SafeAvatar from "./SafeImage";
 import ConfirmDialog from "./ConfirmDialog";
+import Logo from "./Logo";
 import clsx from "clsx";
 
 const NAV = [
@@ -134,8 +134,8 @@ export default function CustomerLayout() {
           className="flex items-center gap-2.5"
           onClick={() => setSidebarOpen(false)}
         >
-          <div className="w-8 h-8 rounded-lg bg-primary-500 flex items-center justify-center shrink-0">
-            <ChefHat size={16} className="text-white" />
+          <div className="w-8 h-8 shrink-0">
+            <Logo className="w-8 h-8" iconOnly />
           </div>
           <div>
             <p className="font-display font-bold text-stone-800 dark:text-white text-sm leading-tight">

@@ -3,6 +3,7 @@ import { Trash2, Plus, Minus, ShoppingCart, ArrowRight } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import SafeImage from "../components/SafeImage";
 import { useAuth } from "../context/AuthContext";
+import Logo from "../components/Logo";
 
 export default function Cart() {
   const { cartItems, cartRestaurant, removeFromCart, updateQuantity, subtotal, clearCart } = useCart();
@@ -52,7 +53,7 @@ export default function Cart() {
                       alt={item.name}
                       className="w-20 h-20 rounded-xl"
                       imgClass="object-cover"
-                      fallback={<div className="w-full h-full flex items-center justify-center text-2xl">🍽️</div>}
+                      fallback={<div className="w-full h-full flex items-center justify-center"><Logo className="w-8 h-8 opacity-50" iconOnly /></div>}
                     />
                   </div>
                   <div className="flex-1 min-w-0">

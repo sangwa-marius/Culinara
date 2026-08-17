@@ -171,7 +171,9 @@ export default function Home() {
             </div>
           ) : featured.length === 0 ? (
             <div className="text-center py-20">
-              <p className="text-4xl mb-3">🍽️</p>
+              <div className="mb-3 flex justify-center">
+                <Logo className="w-16 h-16 opacity-40" iconOnly />
+              </div>
               <p className="text-stone-500">No restaurants yet</p>
             </div>
           ) : (

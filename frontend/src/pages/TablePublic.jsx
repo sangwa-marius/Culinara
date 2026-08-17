@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { Armchair, Users, MapPin, Clock, Store, QrCode, ArrowLeft } from "lucide-react";
 import { Skeleton } from "../components/Skeleton";
 import SafeAvatar from "../components/SafeImage";
+import Logo from "../components/Logo";
 import toast from "react-hot-toast";
 import api from "../services/api";
 import clsx from "clsx";
@@ -45,9 +46,9 @@ export default function TablePublic() {
     </div>
   );
   if (!data?.table || !data?.restaurant) return (
-    <div className="min-h-screen flex items-center justify-center bg-cream-100 dark:bg-stone-950 px-4">
-      <div className="text-center">
-        <div className="text-6xl mb-4">🍽️</div>
+      <div className="min-h-screen flex items-center justify-center bg-cream-100 dark:bg-stone-950 px-4">
+        <div className="text-center">
+          <div className="mb-4 flex justify-center"><Logo className="w-16 h-16" iconOnly /></div>
         <h1 className="text-2xl font-bold text-stone-900 dark:text-white mb-2">Table not found</h1>
         <p className="text-stone-400 mb-6">This table may have been removed or is no longer active.</p>
         <Link to="/" className="btn-primary">Back to Home</Link>
@@ -74,7 +75,7 @@ export default function TablePublic() {
         <div className="card p-5 mb-4">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-12 h-12 rounded-xl bg-cream-200 dark:bg-stone-800 flex items-center justify-center text-2xl shrink-0">
-              {restaurant.logo ? <img src={restaurant.logo} alt={restaurant.name} className="w-full h-full object-cover rounded-xl" /> : "🍽️"}
+              {restaurant.logo ? <img src={restaurant.logo} alt={restaurant.name} className="w-full h-full object-cover rounded-xl" /> : <Logo className="w-8 h-8 opacity-50" iconOnly />}
             </div>
             <div className="min-w-0">
               <h1 className="font-bold text-stone-900 dark:text-white truncate">{restaurant.name}</h1>

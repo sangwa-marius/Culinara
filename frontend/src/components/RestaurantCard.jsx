@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Star, Clock, Bike, MapPin } from "lucide-react";
 import clsx from "clsx";
 import SafeImage from "./SafeImage";
+import Logo from "./Logo";
 
 const DAYS = [
   "sunday",
@@ -57,8 +58,8 @@ export default function RestaurantCard({ restaurant }) {
           className="w-full h-full"
           imgClass="object-cover group-hover:scale-105 transition-transform duration-500"
           fallback={
-            <div className="w-full h-full flex items-center justify-center text-5xl">
-              🍽️
+            <div className="w-full h-full flex items-center justify-center">
+              <Logo className="w-16 h-16" iconOnly />
             </div>
           }
         />

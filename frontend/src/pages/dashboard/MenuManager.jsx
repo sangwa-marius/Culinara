@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Plus, Edit2, Trash2, Eye, EyeOff, ChefHat, X } from "lucide-react";
 import { menuAPI, restaurantAPI } from "../../services/api";
 import { MenuCardSkeleton, Skeleton } from "../../components/Skeleton";
+import Logo from "../../components/Logo";
 import ImageUploader from "../../components/ImageUploader";
 import ConfirmDialog from "../../components/ConfirmDialog";
 import toast from "react-hot-toast";
@@ -186,7 +187,7 @@ export default function MenuManager() {
                   {item.image ? (
                     <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-4xl">🍽️</div>
+                    <div className="w-full h-full flex items-center justify-center"><Logo className="w-10 h-10 opacity-50" iconOnly /></div>
                   )}
                 </div>
 

@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { Star, Clock, Bike, MapPin, Phone, Search, Plus, Minus, X, Layers, ArrowRight, ShoppingCart, ArrowLeft } from "lucide-react";
 import { Skeleton, MenuCardSkeleton, CardSkeleton } from "../components/Skeleton";
 import SafeImage from "../components/SafeImage";
+import Logo from "../components/Logo";
 import { restaurantAPI, menuAPI, collectionAPI } from "../services/api";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
@@ -197,7 +198,7 @@ export default function RestaurantDetail() {
           alt={restaurant.name}
           className="w-full h-full"
           imgClass="object-cover"
-          fallback={<div className="w-full h-full flex items-center justify-center text-8xl">🍽️</div>}
+          fallback={<div className="w-full h-full flex items-center justify-center"><Logo className="w-24 h-24" iconOnly /></div>}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-black/10" />
         <div className="absolute bottom-6 left-6 right-6">
@@ -349,7 +350,7 @@ export default function RestaurantDetail() {
                   <div>
                     <div className="flex items-center gap-4 mb-6">
                       <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden bg-cream-200 dark:bg-stone-800 shrink-0">
-                        <SafeImage src={selectedCollection.coverImage} alt={selectedCollection.name} className="w-full h-full" imgClass="object-cover" fallback={<div className="w-full h-full flex items-center justify-center text-2xl">🍽️</div>} />
+                        <SafeImage src={selectedCollection.coverImage} alt={selectedCollection.name} className="w-full h-full" imgClass="object-cover" fallback={<div className="w-full h-full flex items-center justify-center"><Logo className="w-8 h-8 opacity-50" iconOnly /></div>} />
                       </div>
                       <div className="flex-1 min-w-0">
                         <h2 className="text-xl sm:text-2xl font-bold text-stone-900 dark:text-white">{selectedCollection.name}</h2>
@@ -372,7 +373,7 @@ export default function RestaurantDetail() {
                           return (
                             <div key={item._id} className="card p-3 sm:p-4 flex gap-3 sm:gap-4">
                               <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-cream-200 dark:bg-stone-800 overflow-hidden shrink-0">
-                                <SafeImage src={item.image} alt={item.name} className="w-full h-full" imgClass="object-cover" fallback={<div className="w-full h-full flex items-center justify-center text-xl sm:text-2xl">🍽️</div>} />
+                                <SafeImage src={item.image} alt={item.name} className="w-full h-full" imgClass="object-cover" fallback={<div className="w-full h-full flex items-center justify-center"><Logo className="w-6 h-6 sm:w-8 sm:h-8 opacity-50" iconOnly /></div>} />
                               </div>
                               <div className="flex-1 min-w-0">
                                 <h3 className="text-sm sm:text-base font-semibold text-stone-900 dark:text-white truncate">{item.name}</h3>
@@ -424,7 +425,7 @@ export default function RestaurantDetail() {
                         {collections.map((col) => (
                           <div key={col._id} className="card overflow-hidden group cursor-pointer" onClick={() => setSelectedCollection(col)}>
                             <div className="h-40 sm:h-48 bg-cream-200 dark:bg-stone-800 overflow-hidden relative">
-                              <SafeImage src={col.coverImage} alt={col.name} className="w-full h-full group-hover:scale-105 transition-transform duration-500" imgClass="object-cover" fallback={<div className="w-full h-full flex items-center justify-center text-5xl">🍽️</div>} />
+                              <SafeImage src={col.coverImage} alt={col.name} className="w-full h-full group-hover:scale-105 transition-transform duration-500" imgClass="object-cover" fallback={<div className="w-full h-full flex items-center justify-center"><Logo className="w-12 h-12 opacity-50" iconOnly /></div>} />
                               <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
                               <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4">
                                 <h3 className="font-bold text-white text-base sm:text-lg">{col.name}</h3>
@@ -523,7 +524,7 @@ export default function RestaurantDetail() {
                             alt={item.name}
                             className="w-full h-full"
                             imgClass="object-cover"
-                            fallback={<div className="w-full h-full flex items-center justify-center text-3xl sm:text-4xl">🍽️</div>}
+                            fallback={<div className="w-full h-full flex items-center justify-center"><Logo className="w-8 h-8 sm:w-10 sm:h-10 opacity-50" iconOnly /></div>}
                           />
                         </div>
 

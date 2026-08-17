@@ -5,6 +5,7 @@ import Sidebar from "../../components/Sidebar";
 import OrderStatusBadge from "../../components/OrderStatusBadge";
 import { StatCardSkeleton, CardSkeleton } from "../../components/Skeleton";
 import SafeAvatar from "../../components/SafeImage";
+import Logo from "../../components/Logo";
 import toast from "react-hot-toast";
 import { format } from "date-fns";
 import clsx from "clsx";
@@ -217,7 +218,7 @@ export default function AdminDashboard() {
                       <div key={r._id} className="px-5 py-4 flex items-center justify-between gap-4 hover:bg-cream-50 dark:hover:bg-stone-800/40 transition-colors">
                         <div className="flex items-center gap-3 flex-1 min-w-0">
                           <div className="w-9 h-9 bg-cream-200 dark:bg-stone-800 rounded-lg overflow-hidden shrink-0">
-                            {r.logo ? <img src={r.logo} alt={r.name} className="w-full h-full object-cover" /> : <span className="w-full h-full flex items-center justify-center text-sm">🏪</span>}
+                            {r.logo ? <img src={r.logo} alt={r.name} className="w-full h-full object-cover" /> : <Logo className="w-8 h-8 opacity-50" iconOnly />}
                           </div>
                           <div className="min-w-0">
                             <p className="font-semibold text-stone-900 dark:text-white text-sm truncate">{r.name}</p>

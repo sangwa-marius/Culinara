@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Logo from "./Logo";
 
 /**
  * Normalise an image URL so it always works regardless of how it was stored.
@@ -56,7 +57,7 @@ export default function SafeImage({
   const showFallback = !resolved || failed;
 
   if (showFallback) {
-    const content = fallback ?? <span className="text-5xl">🍽️</span>;
+    const content = fallback ?? <Logo className="w-10 h-10 opacity-60" iconOnly />;
     return (
       <div
         className={`flex items-center justify-center bg-cream-900  dark:bg-stone-800 ${className}`}

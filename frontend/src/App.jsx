@@ -14,6 +14,7 @@ import CustomerLayout    from "./components/CustomerLayout";
 import AdminLayout       from "./components/AdminLayout";
 import ProtectedRoute    from "./components/ProtectedRoute";
 import { Skeleton } from "./components/Skeleton";
+import Logo              from "./components/Logo";
 
 // ── Eagerly loaded ────────────────────────────────────────────────────────────
 import Home        from "./pages/Home";
@@ -220,7 +221,9 @@ export default function App() {
               <Route path="*" element={
                 <PublicLayout>
                   <div className="min-h-screen pt-32 flex flex-col items-center justify-center text-center px-4">
-                    <div className="text-6xl mb-4">🍽️</div>
+                    <div className="mb-4">
+                      <Logo className="w-24 h-24" iconOnly />
+                    </div>
                     <h1 className="font-display text-4xl font-bold text-stone-900 dark:text-white mb-3">Page Not Found</h1>
                     <p className="text-stone-500 mb-6">This page doesn't exist.</p>
                     <a href="/" className="btn-primary">Return Home</a>

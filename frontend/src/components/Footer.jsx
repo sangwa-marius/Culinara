@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import Logo from "./Logo";
 
 const LINKS = {
   Product: [
@@ -32,10 +33,7 @@ export default function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8 py-12 border-b border-stone-800">
           <div className="col-span-2">
             <Link to="/" className="flex items-center gap-2 mb-4 w-fit">
-              <span className="text-xl">🍽️</span>
-              <span className="font-display font-bold text-lg text-black dark:text-white">
-                Culinara
-              </span>
+              <Logo className="h-7 w-auto" />
             </Link>
             <p className="text-sm text-stone-500 leading-relaxed max-w-xs mb-4">
               Precision management for the future of fine dining and casual

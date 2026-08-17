@@ -1,6 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import SafeAvatar from "./SafeImage";
+import Logo from "./Logo";
 import clsx from "clsx";
 
 /**
@@ -28,8 +29,8 @@ export default function Sidebar({ items, bottomItems, title, subtitle }) {
       {/* Brand */}
       <div className="px-4 py-4 border-b border-cream-300 dark:border-stone-800">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-primary-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
-            🍽️
+          <div className="w-8 h-8 shrink-0">
+            <Logo className="w-8 h-8" iconOnly />
           </div>
           <div>
             <p className="font-semibold text-stone-800 dark:text-white text-sm leading-tight">

@@ -4,6 +4,7 @@ import { Package, ChevronRight, Trash2, X } from "lucide-react";
 import { orderAPI } from "../services/api";
 import OrderStatusBadge from "../components/OrderStatusBadge";
 import SafeImage from "../components/SafeImage";
+import Logo from "../components/Logo";
 import { OrderRowSkeleton, CardSkeleton, Skeleton } from "../components/Skeleton";
 import { format } from "date-fns";
 import toast from "react-hot-toast";
@@ -154,7 +155,7 @@ export default function MyOrders() {
                     alt={order.restaurant?.name}
                     className="w-14 h-14 rounded-xl"
                     imgClass="object-cover"
-                    fallback={<div className="w-full h-full flex items-center justify-center text-2xl">🍽️</div>}
+                    fallback={<Logo className="w-8 h-8 opacity-50" iconOnly />}
                   />
                 </div>
 

@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { Eye, EyeOff, User, Mail, Lock, Phone, CheckCircle, XCircle, ChevronRight, ChevronLeft, UtensilsCrossed, Store, Truck, ChefHat } from "lucide-react";
+import { Eye, EyeOff, User, Mail, Lock, Phone, CheckCircle, XCircle, ChevronRight, ChevronLeft, UtensilsCrossed, Store, Truck } from "lucide-react";
 import { GoogleLogin } from "@react-oauth/google";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 import toast from "react-hot-toast";
+import Logo from "../components/Logo";
 
 const ROLES = [
   { value: "customer",         icon: UtensilsCrossed, label: "Customer",         desc: "Order food for delivery" },
@@ -92,7 +93,9 @@ export default function Register() {
       <div className="flex items-center justify-center px-6 py-12 md:col-span-3">
         <div className="w-full max-w-sm">
           <div className="text-center mb-6">
-            <div className="w-12 h-12 bg-primary-500 rounded-xl flex items-center justify-center text-xl mx-auto mb-3"><ChefHat className="text-white" /></div>
+            <div className="w-12 h-12 bg-primary-500 rounded-xl flex items-center justify-center text-xl mx-auto mb-3">
+              <Logo className="w-8 h-8" iconOnly />
+            </div>
             <h1 className="font-display text-2xl font-bold text-stone-900 dark:text-white">Create Account</h1>
             <p className="text-stone-500 dark:text-stone-400 text-sm mt-1">Already have an account? <Link to="/login" className="text-primary-500 font-semibold">Sign In</Link></p>
           </div>
