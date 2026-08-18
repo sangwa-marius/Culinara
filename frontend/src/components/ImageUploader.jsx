@@ -24,14 +24,15 @@ export default function ImageUploader({
   disabled = false,
 }) {
   const [uploading, setUploading] = useState(false);
-  const [dragging,  setDragging]  = useState(false);
+  const [dragging, setDragging] = useState(false);
   const inputRef = useRef(null);
 
-  const aspectClass = {
-    square: "aspect-square",
-    wide:   "aspect-video",
-    free:   "min-h-[120px]",
-  }[aspect] || "aspect-square";
+  const aspectClass =
+    {
+      square: "aspect-square",
+      wide: "aspect-video",
+      free: "min-h-[120px]",
+    }[aspect] || "aspect-square";
 
   const upload = async (file) => {
     if (!file) return;
@@ -60,7 +61,9 @@ export default function ImageUploader({
       onChange?.(data.url);
       toast.success("Image uploaded");
     } catch (err) {
-      toast.error(err.response?.data?.message || "Upload failed — please try again");
+      toast.error(
+        err.response?.data?.message || "Upload failed — please try again",
+      );
     } finally {
       setUploading(false);
     }
@@ -96,7 +99,10 @@ export default function ImageUploader({
 
       <div
         onClick={() => !disabled && !uploading && inputRef.current?.click()}
-        onDragOver={(e) => { e.preventDefault(); if (!disabled) setDragging(true); }}
+        onDragOver={(e) => {
+          e.preventDefault();
+          if (!disabled) setDragging(true);
+        }}
         onDragLeave={() => setDragging(false)}
         onDrop={handleDrop}
         className={clsx(
@@ -109,7 +115,7 @@ export default function ImageUploader({
             ? "border-primary-400 bg-primary-50 dark:bg-primary-950/20 scale-[1.01]"
             : value
               ? "border-cream-300 dark:border-stone-700 hover:border-primary-400 dark:hover:border-primary-600"
-              : "border-cream-400 dark:border-stone-700 hover:border-primary-400 dark:hover:border-primary-600 bg-cream-100 dark:bg-stone-800/40"
+              : "border-cream-400 dark:border-stone-700 hover:border-primary-400 dark:hover:border-primary-600 bg-cream-100 dark:bg-stone-800/40",
         )}
       >
         {/* Preview */}
@@ -119,7 +125,9 @@ export default function ImageUploader({
               src={value}
               alt="Upload preview"
               className="absolute inset-0 w-full h-full object-cover"
-              onError={(e) => { e.target.style.display = "none"; }}
+              onError={(e) => {
+                e.target.style.display = "none";
+              }}
             />
             {/* Dark overlay on hover */}
             <div className="absolute inset-0 bg-black/0 hover:bg-black/30 transition-colors flex items-center justify-center opacity-0 hover:opacity-100">
@@ -149,24 +157,29 @@ export default function ImageUploader({
         {uploading && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/80 dark:bg-stone-900/80 backdrop-blur-sm gap-3">
             <Loader2 size={28} className="text-primary-500 animate-spin" />
-            <p className="text-xs font-semibold text-stone-600 dark:text-stone-300">Uploading…</p>
+            <p className="text-xs font-semibold text-stone-600 dark:text-stone-300">
+              Uploading…
+            </p>
           </div>
         )}
 
         {/* Empty state */}
         {!value && !uploading && (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 p-4">
-            <div className={clsx(
-              "rounded-xl flex items-center justify-center transition-colors",
-              aspect === "square" ? "w-12 h-12" : "w-10 h-10",
-              dragging
-                ? "bg-primary-100 dark:bg-primary-900/40"
-                : "bg-cream-200 dark:bg-stone-700"
-            )}>
-              {dragging
-                ? <Upload size={20} className="text-primary-500" />
-                : <Image size={18} className="text-stone-400" />
-              }
+            <div
+              className={clsx(
+                "rounded-xl flex items-center justify-center transition-colors",
+                aspect === "square" ? "w-12 h-12" : "w-10 h-10",
+                dragging
+                  ? "bg-primary-100 dark:bg-primary-900/40"
+                  : "bg-cream-200 dark:bg-stone-700",
+              )}
+            >
+              {dragging ? (
+                <Upload size={20} className="text-primary-500" />
+              ) : (
+                <Image size={18} className="text-stone-400" />
+              )}
             </div>
             <div className="text-center">
               <p className="text-xs font-semibold text-stone-600 dark:text-stone-300">
