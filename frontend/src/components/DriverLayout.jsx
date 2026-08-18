@@ -272,7 +272,11 @@ export default function DriverLayout() {
         message="You will need to log in again to access your driver account."
         confirmLabel="Sign Out"
         variant="danger"
-        onConfirm={() => { setLogoutConfirm(false); logout(); navigate("/"); }}
+        onConfirm={() => {
+          setLogoutConfirm(false);
+          logout();
+          navigate("/");
+        }}
         onCancel={() => setLogoutConfirm(false)}
       />
     </div>
