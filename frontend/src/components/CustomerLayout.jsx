@@ -54,11 +54,16 @@ const GROUPS = [
     id: "account",
     label: "Account",
     items: [
-      {to: "/orders",        label: "My Orders",     icon: Package, exact: false },
-      {to: "/notifications", label: "Notifications", icon: Bell,    exact: true, badge: true,},
-      {to: "/profile",       label: "Profile",       icon: User,    exact: true },
+      { to: "/orders", label: "My Orders", icon: Package, exact: false },
+      {
+        to: "/notifications",
+        label: "Notifications",
+        icon: Bell,
+        exact: true,
+        badge: true,
+      },
+      { to: "/profile", label: "Profile", icon: User, exact: true },
     ],
-
   },
   {
     id: "shopping",
@@ -346,7 +351,11 @@ export default function CustomerLayout() {
         message="You will need to log in again to access your account."
         confirmLabel="Sign Out"
         variant="danger"
-        onConfirm={() => { setLogoutConfirm(false); logout(); navigate("/"); }}
+        onConfirm={() => {
+          setLogoutConfirm(false);
+          logout();
+          navigate("/");
+        }}
         onCancel={() => setLogoutConfirm(false)}
       />
     </div>
