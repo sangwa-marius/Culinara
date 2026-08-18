@@ -14,8 +14,14 @@ function buildDirectionsUrl(origin, destination) {
 }
 
 export default function InlineMap({ origin, destination, className }) {
-  const src = useMemo(() => buildMapSrc(origin, destination), [origin, destination]);
-  const directionsUrl = useMemo(() => buildDirectionsUrl(origin, destination), [origin, destination]);
+  const src = useMemo(
+    () => buildMapSrc(origin, destination),
+    [origin, destination],
+  );
+  const directionsUrl = useMemo(
+    () => buildDirectionsUrl(origin, destination),
+    [origin, destination],
+  );
 
   return (
     <div className={clsx("space-y-2", className)}>
