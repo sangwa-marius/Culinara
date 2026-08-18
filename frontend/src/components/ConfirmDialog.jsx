@@ -20,19 +20,21 @@ import clsx from "clsx";
  */
 export default function ConfirmDialog({
   open,
-  title       = "Are you sure?",
-  message     = "This action cannot be undone.",
-  confirmLabel= "Confirm",
+  title = "Are you sure?",
+  message = "This action cannot be undone.",
+  confirmLabel = "Confirm",
   cancelLabel = "Cancel",
-  variant     = "danger",     // "danger" | "warning" | "info"
-  loading     = false,
+  variant = "danger", // "danger" | "warning" | "info"
+  loading = false,
   onConfirm,
   onCancel,
 }) {
   // Close on Escape
   useEffect(() => {
     if (!open) return;
-    const handler = (e) => { if (e.key === "Escape") onCancel?.(); };
+    const handler = (e) => {
+      if (e.key === "Escape") onCancel?.();
+    };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, [open, onCancel]);
@@ -40,12 +42,32 @@ export default function ConfirmDialog({
   if (!open) return null;
 
   const CONFIG = {
-    danger:  { icon: Trash2,         iconBg: "bg-red-100 dark:bg-red-900/30",    iconColor: "text-red-500",    btn: "bg-red-500 hover:bg-red-600 active:bg-red-700 text-white" },
-    warning: { icon: AlertTriangle,   iconBg: "bg-amber-100 dark:bg-amber-900/30",iconColor: "text-amber-500",  btn: "bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-white" },
-    info:    { icon: Info,            iconBg: "bg-blue-100 dark:bg-blue-900/30",  iconColor: "text-blue-500",   btn: "bg-primary-500 hover:bg-primary-600 active:bg-primary-700 text-white" },
+    danger: {
+      icon: Trash2,
+      iconBg: "bg-red-100 dark:bg-red-900/30",
+      iconColor: "text-red-500",
+      btn: "bg-red-500 hover:bg-red-600 active:bg-red-700 text-white",
+    },
+    warning: {
+      icon: AlertTriangle,
+      iconBg: "bg-amber-100 dark:bg-amber-900/30",
+      iconColor: "text-amber-500",
+      btn: "bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-white",
+    },
+    info: {
+      icon: Info,
+      iconBg: "bg-blue-100 dark:bg-blue-900/30",
+      iconColor: "text-blue-500",
+      btn: "bg-primary-500 hover:bg-primary-600 active:bg-primary-700 text-white",
+    },
   };
 
-  const { icon: Icon, iconBg, iconColor, btn } = CONFIG[variant] || CONFIG.danger;
+  const {
+    icon: Icon,
+    iconBg,
+    iconColor,
+    btn,
+  } = CONFIG[variant] || CONFIG.danger;
 
   return (
     <div
@@ -72,12 +94,20 @@ export default function ConfirmDialog({
         </button>
 
         {/* Icon */}
-        <div className={clsx("w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4", iconBg)}>
+        <div
+          className={clsx(
+            "w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4",
+            iconBg,
+          )}
+        >
           <Icon size={22} className={iconColor} />
         </div>
 
         {/* Text */}
-        <h3 id="confirm-title" className="font-bold text-stone-900 dark:text-white text-center text-base mb-2">
+        <h3
+          id="confirm-title"
+          className="font-bold text-stone-900 dark:text-white text-center text-base mb-2"
+        >
           {title}
         </h3>
         {message && (
@@ -98,12 +128,16 @@ export default function ConfirmDialog({
           <button
             onClick={onConfirm}
             disabled={loading}
-            className={clsx("flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-60", btn)}
+            className={clsx(
+              "flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-60",
+              btn,
+            )}
           >
-            {loading
-              ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              : confirmLabel
-            }
+            {loading ? (
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            ) : (
+              confirmLabel
+            )}
           </button>
         </div>
       </div>
