@@ -6,11 +6,11 @@ import toast from "react-hot-toast";
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const [user,    setUser]    = useState(null);
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token     = localStorage.getItem("fh_token");
+    const token = localStorage.getItem("fh_token");
     const savedUser = localStorage.getItem("fh_user");
     if (token && savedUser) {
       const parsed = JSON.parse(savedUser);
@@ -72,7 +72,18 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, loginWithGoogle, logout, updateUser, loginWithToken }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        login,
+        register,
+        loginWithGoogle,
+        logout,
+        updateUser,
+        loginWithToken,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

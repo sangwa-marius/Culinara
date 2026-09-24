@@ -6,7 +6,12 @@ import { useRef, useEffect } from "react";
 
 const NotificationContext = createContext(null);
 
-const TYPE_ICONS = { order: "📦", promo: "🎉", system: "🔔", delivery_request: "🚗" };
+const TYPE_ICONS = {
+  order: "📦",
+  promo: "🎉",
+  system: "🔔",
+  delivery_request: "🚗",
+};
 
 export function NotificationProvider({ children }) {
   const { user } = useAuth();
@@ -56,6 +61,9 @@ export function NotificationProvider({ children }) {
 
 export function useNotificationContext() {
   const ctx = useContext(NotificationContext);
-  if (!ctx) throw new Error("useNotificationContext must be used inside NotificationProvider");
+  if (!ctx)
+    throw new Error(
+      "useNotificationContext must be used inside NotificationProvider",
+    );
   return ctx;
 }
